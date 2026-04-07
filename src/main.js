@@ -1,23 +1,26 @@
 // ═══════════════════════════════════════════════════════
-//  SHATTERED REALMS — Entry Point
+//  SHATTERED REALMS — Entry Point (Portrait Mode)
 // ═══════════════════════════════════════════════════════
 
 window.GameState = {
   world: 1, level: 1,
   score: 0, hp: 3, maxHp: 3,
   voidShards: 0, upgrades: [],
-  ballSpeed: 390, paddleWidth: 140, startBalls: 1,
+  ballSpeed: 350, paddleWidth: 120, startBalls: 1,
   hasLaser: false, netBounces: 0,
   voidShieldCharges: 0, timeDilationCharges: 0,
   fireCoreDuration: 0, ghostDuration: 0,
   chainChance: 0, hasMagnet: false, explosiveEvery: 0,
   bricksBroken: 0, bossesDefeated: 0,
+  // XP / Roguelite
+  xp: 0, xpLevel: 0, enemiesKilled: 0,
+  piercingCount: 0, scoreMult: 1, puDurationMult: 1, dropLuckMult: 1,
 };
 
 const config = {
   type: Phaser.AUTO,
-  width: 960,
-  height: 640,
+  width: 480,
+  height: 854,
   backgroundColor: '#000005',
   parent: 'game-container',
 
@@ -39,7 +42,6 @@ const config = {
     MenuScene,
     NarrativeScene,
     GameScene,
-    UpgradeScene,
     GameOverScene,
     VictoryScene,
   ],

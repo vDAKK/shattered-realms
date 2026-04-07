@@ -13,7 +13,7 @@
   <meta name="application-name" content="Shattered Realms">
   <meta name="description" content="Un roguelite brick-breaker narratif">
 
-  <!-- Icons (générés dynamiquement, voir script ci-dessous) -->
+  <!-- Icons (générés dynamiquement) -->
   <link rel="apple-touch-icon" id="apple-icon" href="">
   <link rel="icon" id="favicon" type="image/png" href="">
   <link rel="manifest" href="manifest.json">
@@ -21,7 +21,7 @@
   <title>SHATTERED REALMS</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- Génération dynamique des icônes (pas d'assets image nécessaires) -->
+  <!-- Génération dynamique des icônes -->
   <script>
     function generateIcon(size) {
       const c = document.createElement('canvas');
@@ -29,14 +29,12 @@
       const ctx = c.getContext('2d');
       const cx = size / 2, cy = size / 2;
 
-      // Fond dégradé
       const bg = ctx.createLinearGradient(0, 0, size, size);
       bg.addColorStop(0, '#000510');
       bg.addColorStop(1, '#020a1a');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, size, size);
 
-      // Grille subtile
       ctx.strokeStyle = 'rgba(0,229,255,0.07)';
       ctx.lineWidth = 1;
       for (let i = size / 5; i < size; i += size / 5) {
@@ -44,19 +42,17 @@
         ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(size, i); ctx.stroke();
       }
 
-      // Halo extérieur
       const halo = ctx.createRadialGradient(cx, cy, size * 0.1, cx, cy, size * 0.5);
       halo.addColorStop(0, 'rgba(0,229,255,0.18)');
       halo.addColorStop(1, 'rgba(0,229,255,0)');
       ctx.fillStyle = halo;
       ctx.fillRect(0, 0, size, size);
 
-      // Cristal principal (diamant)
       const s = size * 0.3;
       ctx.beginPath();
-      ctx.moveTo(cx,      cy - s);
+      ctx.moveTo(cx, cy - s);
       ctx.lineTo(cx + s * 0.75, cy);
-      ctx.lineTo(cx,      cy + s);
+      ctx.lineTo(cx, cy + s);
       ctx.lineTo(cx - s * 0.75, cy);
       ctx.closePath();
       ctx.fillStyle = 'rgba(0,229,255,0.12)';
@@ -65,12 +61,11 @@
       ctx.lineWidth = Math.max(1.5, size * 0.015);
       ctx.stroke();
 
-      // Cristal intérieur
       const si = s * 0.55;
       ctx.beginPath();
-      ctx.moveTo(cx,         cy - si);
+      ctx.moveTo(cx, cy - si);
       ctx.lineTo(cx + si * 0.75, cy);
-      ctx.lineTo(cx,         cy + si);
+      ctx.lineTo(cx, cy + si);
       ctx.lineTo(cx - si * 0.75, cy);
       ctx.closePath();
       const fill = ctx.createLinearGradient(cx, cy - si, cx, cy + si);
@@ -80,17 +75,15 @@
       ctx.fillStyle = fill;
       ctx.fill();
 
-      // Reflet
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       ctx.beginPath();
-      ctx.moveTo(cx,         cy - si);
+      ctx.moveTo(cx, cy - si);
       ctx.lineTo(cx + si * 0.3, cy - si * 0.3);
-      ctx.lineTo(cx,         cy - si * 0.1);
+      ctx.lineTo(cx, cy - si * 0.1);
       ctx.lineTo(cx - si * 0.3, cy - si * 0.3);
       ctx.closePath();
       ctx.fill();
 
-      // Titre "SR" discret en bas
       ctx.fillStyle = 'rgba(0,229,255,0.4)';
       ctx.font = `bold ${Math.round(size * 0.13)}px "Courier New", monospace`;
       ctx.textAlign = 'center';
@@ -100,7 +93,6 @@
       return c.toDataURL('image/png');
     }
 
-    // Injecte les icônes dès que le DOM est prêt
     document.addEventListener('DOMContentLoaded', () => {
       const icon = generateIcon(180);
       document.getElementById('apple-icon').href = icon;
@@ -109,15 +101,6 @@
   </script>
 </head>
 <body>
-  <!-- Overlay portrait (mobile) -->
-  <div id="rotate-overlay">
-    <div id="rotate-content">
-      <div id="rotate-icon">⟳</div>
-      <p>Tournez votre appareil</p>
-      <p class="rotate-sub">SHATTERED REALMS se joue en mode paysage</p>
-    </div>
-  </div>
-
   <div id="game-wrapper">
     <div id="game-container"></div>
   </div>
@@ -140,22 +123,9 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .catch(() => {}); // silencieux si hors-ligne au premier chargement
+          .catch(() => {});
       });
     }
-
-    // Gestion overlay portrait
-    function checkOrientation() {
-      const overlay = document.getElementById('rotate-overlay');
-      if (!overlay) return;
-      // Sur desktop ou tablette en paysage : cacher
-      const isPortrait = window.innerHeight > window.innerWidth;
-      const isMobile = window.innerWidth < 1024;
-      overlay.style.display = (isPortrait && isMobile) ? 'flex' : 'none';
-    }
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
-    document.addEventListener('DOMContentLoaded', checkOrientation);
   </script>
 </body>
 </html>

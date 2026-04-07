@@ -7,49 +7,33 @@ class MenuScene extends Phaser.Scene {
     // ── Background ────────────────────────────────────────
     this.add.rectangle(W / 2, H / 2, W, H, 0x020810);
     this._createStarField(W, H);
-
-    // ── Animated grid lines ───────────────────────────────
     this._createGridLines(W, H);
-
-    // ── Floating crystal particles ─────────────────────────
     this._createFloatingParticles(W, H);
 
     // ── Title ─────────────────────────────────────────────
-    const titleY = H * 0.22;
+    const titleY = H * 0.14;
 
-    // Glow layer
     const glowTitle = this.add.text(W / 2, titleY + 2, 'SHATTERED', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '68px',
-      fontStyle: 'bold',
-      color: '#001133',
-      stroke: '#00e5ff',
-      strokeThickness: 12,
+      fontSize: '42px', fontStyle: 'bold',
+      color: '#001133', stroke: '#00e5ff', strokeThickness: 10,
     }).setOrigin(0.5).setAlpha(0.5);
 
     this.add.text(W / 2, titleY, 'SHATTERED', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '68px',
-      fontStyle: 'bold',
-      color: '#ffffff',
-      stroke: '#00aaff',
-      strokeThickness: 4,
+      fontSize: '42px', fontStyle: 'bold',
+      color: '#ffffff', stroke: '#00aaff', strokeThickness: 3,
     }).setOrigin(0.5);
 
-    this.add.text(W / 2, titleY + 72, 'R E A L M S', {
+    this.add.text(W / 2, titleY + 50, 'R E A L M S', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '32px',
-      fontStyle: 'bold',
-      color: '#00e5ff',
-      letterSpacing: 14,
+      fontSize: '22px', fontStyle: 'bold',
+      color: '#00e5ff', letterSpacing: 10,
     }).setOrigin(0.5);
 
-    // Subtitle line
-    this.add.text(W / 2, titleY + 120, '— Un jeu de bris narratif —', {
+    this.add.text(W / 2, titleY + 82, '— Un roguelite brick-breaker —', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '14px',
-      color: '#335566',
-      letterSpacing: 2,
+      fontSize: '11px', color: '#335566', letterSpacing: 1,
     }).setOrigin(0.5);
 
     // ── World label strip ─────────────────────────────────
@@ -59,221 +43,163 @@ class MenuScene extends Phaser.Scene {
       { name: 'VIDE',    color: '#aa00ff' },
       { name: 'NÉON',    color: '#00ff88' },
     ];
-    const stripY = titleY + 155;
+    const stripY = titleY + 110;
     worlds.forEach((w, i) => {
-      const x = W * 0.2 + i * (W * 0.2);
-      const rect = this.add.rectangle(x, stripY, 140, 30, 0x000000, 0);
+      const x = W * 0.15 + i * (W * 0.23);
       this.add.text(x, stripY, w.name, {
         fontFamily: 'Orbitron, Courier New',
-        fontSize: '11px',
-        color: w.color,
-        letterSpacing: 4,
+        fontSize: '9px', color: w.color, letterSpacing: 2,
       }).setOrigin(0.5);
-      const line = this.add.rectangle(x, stripY + 18, 140, 1, parseInt(w.color.replace('#', '0x')), 0.6);
+      const line = this.add.rectangle(x, stripY + 12, 80, 1, parseInt(w.color.replace('#', '0x')), 0.6);
       this.tweens.add({
         targets: line, alpha: { from: 0.2, to: 0.9 },
-        duration: 1200 + i * 300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
+        duration: 1200 + i * 300, yoyo: true, repeat: -1
       });
     });
 
     // ── Menu buttons ──────────────────────────────────────
-    const btnY = H * 0.62;
-    this._createButton(W / 2, btnY,      'NOUVELLE PARTIE', '#00e5ff', () => this._startGame());
-    this._createButton(W / 2, btnY + 65, 'AMÉLIORATIONS',   '#ffcc00', () => this._openMeta());
-    this._createButton(W / 2, btnY + 130,'CRÉDITS',          '#888888', () => this._showCredits());
+    const btnY = H * 0.46;
+    this._createButton(W / 2, btnY,       'NOUVELLE PARTIE', '#00e5ff', () => this._startGame());
+    this._createButton(W / 2, btnY + 55,  'AMÉLIORATIONS',   '#ffcc00', () => this._openMeta());
+    this._createButton(W / 2, btnY + 110, 'CRÉDITS',          '#888888', () => this._showCredits());
 
-    // ── Bottom lore text ──────────────────────────────────
-    this.add.text(W / 2, H - 30, 'MONDE CRISTALLISÉ PAR LE VOID ARCHITECT  |  KAEL DOIT LE BRISER', {
+    // ── Meta stats preview ────────────────────────────────
+    const meta = this._loadMeta();
+    const statsY = H * 0.76;
+    this.add.text(W / 2, statsY, `MEILLEUR SCORE: ${(meta.bestScore || 0).toString().padStart(6, '0')}`, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px',
-      color: '#224444',
-      letterSpacing: 1,
+      fontSize: '11px', color: '#334455',
+    }).setOrigin(0.5);
+    this.add.text(W / 2, statsY + 18, `ÉCLATS: ${meta.totalShards || 0} ◆  |  PARTIES: ${meta.totalRuns || 0}  |  VICTOIRES: ${meta.wins || 0}`, {
+      fontFamily: 'Share Tech Mono, Courier New',
+      fontSize: '9px', color: '#223344',
     }).setOrigin(0.5);
 
     // ── Controls hint ─────────────────────────────────────
-    this.add.text(W / 2, H - 52, 'SOURIS → déplacer  |  CLIC → lancer  |  CLIC DROIT → laser  |  ESPACE → ralentir', {
+    this.add.text(W / 2, H - 40, 'TOUCHER → déplacer  |  TAP → lancer', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px',
-      color: '#2a4455',
+      fontSize: '9px', color: '#2a4455',
     }).setOrigin(0.5);
 
-    // ── Pulsing title glow ────────────────────────────────
+    this.add.text(W / 2, H - 24, 'XP → upgrades en jeu  |  Éclats → upgrades permanents', {
+      fontFamily: 'Share Tech Mono, Courier New',
+      fontSize: '9px', color: '#2a4455',
+    }).setOrigin(0.5);
+
+    // ── Pulsing glow ──────────────────────────────────────
     this.tweens.add({
       targets: glowTitle, alpha: { from: 0.3, to: 0.7 },
-      duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
+      duration: 1800, yoyo: true, repeat: -1
     });
 
-    // ── Version ───────────────────────────────────────────
-    this.add.text(W - 12, H - 10, 'v1.0', {
+    this.add.text(W - 8, H - 8, 'v2.0', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '10px', color: '#223333',
+      fontSize: '9px', color: '#223333',
     }).setOrigin(1, 1);
 
-    // ── Floating brick preview ────────────────────────────
-    this._createBrickPreview(W, H);
-
-    // ── Music note (flavor) ───────────────────────────────
     this._scanlineEffect(W, H);
   }
 
   _createButton(x, y, label, color, callback) {
     const W = this.scale.width;
-    const bg = this.add.rectangle(x, y, 280, 46, 0x000000, 0);
-    const border = this.add.rectangle(x, y, 280, 46, 0x000000, 0);
+    const btnW = W - 60;
+    const bg = this.add.rectangle(x, y, btnW, 42, 0x000000, 0);
+    const border = this.add.rectangle(x, y, btnW, 42, 0x000000, 0);
     border.setStrokeStyle(1, parseInt(color.replace('#', '0x')), 0.5);
 
     const text = this.add.text(x, y, label, {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '15px',
-      fontStyle: 'bold',
-      color: color,
-      letterSpacing: 3,
+      fontSize: '13px', fontStyle: 'bold',
+      color: color, letterSpacing: 3,
     }).setOrigin(0.5);
 
-    // Left/right chevrons
-    const leftChevron  = this.add.text(x - 155, y, '▶', { fontFamily: 'monospace', fontSize: '12px', color: color }).setOrigin(0.5).setAlpha(0);
-    const rightChevron = this.add.text(x + 155, y, '◀', { fontFamily: 'monospace', fontSize: '12px', color: color }).setOrigin(0.5).setAlpha(0);
-
-    const zone = this.add.zone(x, y, 290, 50).setInteractive({ cursor: 'pointer' });
+    const zone = this.add.zone(x, y, btnW + 10, 46).setInteractive({ cursor: 'pointer' });
 
     zone.on('pointerover', () => {
       bg.setFillStyle(parseInt(color.replace('#', '0x')), 0.08);
       border.setStrokeStyle(1, parseInt(color.replace('#', '0x')), 1);
       text.setColor('#ffffff');
-      leftChevron.setAlpha(1);
-      rightChevron.setAlpha(1);
-      this.tweens.add({ targets: [leftChevron, rightChevron], alpha: { from: 0.5, to: 1.0 }, duration: 400, yoyo: true, repeat: -1 });
     });
-
     zone.on('pointerout', () => {
       bg.setFillStyle(0x000000, 0);
       border.setStrokeStyle(1, parseInt(color.replace('#', '0x')), 0.5);
       text.setColor(color);
-      leftChevron.setAlpha(0);
-      rightChevron.setAlpha(0);
-      this.tweens.killTweensOf([leftChevron, rightChevron]);
     });
-
     zone.on('pointerdown', () => {
       this.tweens.add({
         targets: text, scaleX: 0.92, scaleY: 0.92,
-        duration: 80, yoyo: true, ease: 'Quad.easeOut',
-        onComplete: callback
+        duration: 60, yoyo: true, onComplete: callback
       });
     });
   }
 
   _createStarField(W, H) {
-    const stars = [];
-    for (let i = 0; i < 200; i++) {
-      const x = Phaser.Math.Between(0, W);
-      const y = Phaser.Math.Between(0, H);
-      const size = Phaser.Math.FloatBetween(0.5, 2);
-      const alpha = Phaser.Math.FloatBetween(0.1, 0.8);
-      const star = this.add.circle(x, y, size, 0xffffff, alpha);
-      stars.push(star);
-
+    for (let i = 0; i < 150; i++) {
+      const star = this.add.circle(
+        Phaser.Math.Between(0, W), Phaser.Math.Between(0, H),
+        Phaser.Math.FloatBetween(0.5, 1.5), 0xffffff,
+        Phaser.Math.FloatBetween(0.1, 0.6)
+      );
       if (Math.random() < 0.3) {
         this.tweens.add({
-          targets: star, alpha: { from: alpha * 0.3, to: alpha },
-          duration: Phaser.Math.Between(1000, 3000),
-          yoyo: true, repeat: -1, delay: Phaser.Math.Between(0, 2000),
-          ease: 'Sine.easeInOut'
+          targets: star, alpha: { from: star.alpha * 0.3, to: star.alpha },
+          duration: Phaser.Math.Between(1000, 3000), yoyo: true, repeat: -1,
+          delay: Phaser.Math.Between(0, 2000)
         });
       }
     }
   }
 
   _createGridLines(W, H) {
-    const graphics = this.add.graphics();
-    graphics.lineStyle(1, 0x001133, 0.4);
-    for (let x = 0; x < W; x += 60) {
-      graphics.lineBetween(x, 0, x, H);
-    }
-    for (let y = 0; y < H; y += 60) {
-      graphics.lineBetween(0, y, W, y);
-    }
+    const g = this.add.graphics();
+    g.lineStyle(1, 0x001133, 0.3);
+    for (let x = 0; x < W; x += 40) g.lineBetween(x, 0, x, H);
+    for (let y = 0; y < H; y += 40) g.lineBetween(0, y, W, y);
   }
 
   _createFloatingParticles(W, H) {
-    // Create drifting particles that look like void fragments
-    for (let i = 0; i < 15; i++) {
-      const x = Phaser.Math.Between(50, W - 50);
-      const y = Phaser.Math.Between(50, H - 50);
+    for (let i = 0; i < 10; i++) {
+      const x = Phaser.Math.Between(30, W - 30);
+      const y = Phaser.Math.Between(30, H - 30);
       const color = Phaser.Utils.Array.GetRandom([0x00e5ff, 0xaa00ff, 0xff4400, 0x00ff88]);
-      const size = Phaser.Math.FloatBetween(1, 4);
-      const particle = this.add.circle(x, y, size, color, 0.6);
-
+      const p = this.add.circle(x, y, Phaser.Math.FloatBetween(1, 3), color, 0.4);
       this.tweens.add({
-        targets: particle,
-        x: x + Phaser.Math.Between(-80, 80),
-        y: y + Phaser.Math.Between(-60, 60),
-        alpha: { from: 0.1, to: 0.7 },
-        duration: Phaser.Math.Between(3000, 8000),
-        yoyo: true, repeat: -1, delay: Phaser.Math.Between(0, 4000),
-        ease: 'Sine.easeInOut'
-      });
-    }
-  }
-
-  _createBrickPreview(W, H) {
-    // Small animated brick display on right side
-    const colors = [0x00e5ff, 0x00aaff, 0x0088ff, 0xff4400, 0xff8800, 0xaa00ff, 0x00ff88];
-    const startX = W - 20;
-    for (let i = 0; i < 7; i++) {
-      const brickH = 18;
-      const gap = 4;
-      const yPos = H * 0.3 + i * (brickH + gap);
-      const brick = this.add.rectangle(startX, yPos, 6, brickH, colors[i], 0.6);
-      this.tweens.add({
-        targets: brick,
-        x: startX - 2, alpha: { from: 0.3, to: 0.8 },
-        duration: 600 + i * 150,
-        yoyo: true, repeat: -1, delay: i * 100,
-        ease: 'Sine.easeInOut'
+        targets: p,
+        x: x + Phaser.Math.Between(-50, 50), y: y + Phaser.Math.Between(-40, 40),
+        alpha: { from: 0.1, to: 0.6 },
+        duration: Phaser.Math.Between(3000, 7000), yoyo: true, repeat: -1,
+        delay: Phaser.Math.Between(0, 3000)
       });
     }
   }
 
   _scanlineEffect(W, H) {
-    // Periodic horizontal sweep line
-    const scanline = this.add.rectangle(W / 2, -2, W, 2, 0x00e5ff, 0.06);
-    this.tweens.add({
-      targets: scanline, y: H + 2,
-      duration: 4000, repeat: -1, delay: 2000,
-      ease: 'Linear'
-    });
+    const scanline = this.add.rectangle(W / 2, -2, W, 2, 0x00e5ff, 0.05);
+    this.tweens.add({ targets: scanline, y: H + 2, duration: 4000, repeat: -1, delay: 2000 });
   }
 
   _startGame() {
-    // Init / reset game state
     const meta = this._loadMeta();
     window.GameState = {
-      world: 1,
-      level: 1,
-      score: 0,
+      world: 1, level: 1, score: 0,
       hp: 3 + (meta.extraHp || 0),
       maxHp: 3 + (meta.extraHp || 0),
-      voidShards: 0,
-      upgrades: [],
-      ballSpeed: 390 + (meta.extraSpeed || 0),
-      paddleWidth: 140,
+      voidShards: 0, upgrades: [],
+      ballSpeed: 350 + (meta.extraSpeed || 0),
+      paddleWidth: 120 + (meta.extraPaddleW || 0),
       startBalls: 1 + (meta.extraBalls || 0),
-      hasLaser: false,
-      netBounces: 0,
-      voidShieldCharges: 0,
-      timeDilationCharges: 0,
-      fireCoreDuration: 0,
-      ghostDuration: 0,
-      chainChance: 0,
-      hasMagnet: false,
-      explosiveEvery: 0,
-      bricksBroken: 0,
-      bossesDefeated: 0,
+      hasLaser: !!(meta.startLaser),
+      netBounces: (meta.extraNet || 0),
+      voidShieldCharges: 0, timeDilationCharges: 0,
+      fireCoreDuration: 0, ghostDuration: 0,
+      chainChance: 0, hasMagnet: false, explosiveEvery: 0,
+      bricksBroken: 0, bossesDefeated: 0,
+      xp: 0, xpLevel: 0, enemiesKilled: 0,
+      piercingCount: 0, scoreMult: 1, puDurationMult: 1, dropLuckMult: 1,
       metaUpgrades: meta,
     };
 
-    this.cameras.main.fadeOut(600, 0, 0, 0);
+    this.cameras.main.fadeOut(500, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start('NarrativeScene', {
         lines: NARRATIVE.opening,
@@ -287,46 +213,141 @@ class MenuScene extends Phaser.Scene {
   _openMeta() {
     const meta = this._loadMeta();
     const W = this.scale.width, H = this.scale.height;
-    const overlay = this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.9).setDepth(200);
-    const lines = [
-      'ÉCLATS DU VIDE TOTAUX : ' + (meta.totalShards || 0) + ' ◆',
-      'MEILLEUR SCORE : ' + (meta.bestScore || 0).toString().padStart(7, '0'),
-      'PARTIES JOUÉES : ' + (meta.totalRuns || 0),
-      'VICTOIRES : ' + (meta.wins || 0),
-      '',
-      '── AMÉLIORATIONS PERMANENTES (à venir) ──',
-      '',
-      'Accumule des Éclats en jouant.',
-      'Les améliorations méta seront débloquées ici.',
-      '',
-      '[ CLIQUER POUR FERMER ]',
-    ].join('\n');
-    const txt = this.add.text(W / 2, H / 2, lines, {
+    const overlay = this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.92).setDepth(200).setInteractive();
+
+    // Title
+    this.add.text(W / 2, H * 0.06, 'AMÉLIORATIONS PERMANENTES', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '14px', color: '#00e5ff', align: 'center', lineSpacing: 8,
+      fontSize: '14px', fontStyle: 'bold', color: '#ffcc00', letterSpacing: 2,
     }).setOrigin(0.5).setDepth(201);
-    overlay.setInteractive();
-    overlay.on('pointerdown', () => { overlay.destroy(); txt.destroy(); });
+
+    // Shards display
+    const shardsText = this.add.text(W / 2, H * 0.10, `◆ ${meta.totalShards || 0} ÉCLATS DISPONIBLES`, {
+      fontFamily: 'Share Tech Mono, Courier New',
+      fontSize: '12px', color: '#aa88ff',
+    }).setOrigin(0.5).setDepth(201);
+
+    // Meta upgrades
+    const upgrades = [
+      { key: 'extraHp',      label: '+1 PV Max',          cost: 25,  max: 3,  unit: '' },
+      { key: 'extraSpeed',   label: '+20 Vitesse Balle',  cost: 30,  max: 5,  unit: '', step: 20 },
+      { key: 'extraBalls',   label: '+1 Balle Départ',    cost: 60,  max: 2,  unit: '' },
+      { key: 'extraPaddleW', label: '+15px Palette',       cost: 25,  max: 4,  unit: 'px', step: 15 },
+      { key: 'startLaser',   label: 'Laser Permanent',    cost: 50,  max: 1,  unit: '' },
+      { key: 'extraNet',     label: '+2 Filet Départ',    cost: 40,  max: 3,  unit: '', step: 2 },
+    ];
+
+    const startY = H * 0.16;
+    const elements = [overlay, shardsText];
+
+    upgrades.forEach((upg, i) => {
+      const y = startY + i * 72;
+      const current = meta[upg.key] || 0;
+      const currentLevel = upg.step ? current / upg.step : current;
+      const isMaxed = currentLevel >= upg.max;
+      const cost = upg.cost * (currentLevel + 1); // escalating cost
+
+      // Card background
+      const cardBg = this.add.rectangle(W / 2, y + 20, W - 24, 60, 0x060c18, 1).setDepth(201);
+      const cardBorder = this.add.rectangle(W / 2, y + 20, W - 24, 60, 0, 0)
+        .setStrokeStyle(1, isMaxed ? 0x334455 : 0xffcc00, 0.4).setDepth(201);
+
+      const nameText = this.add.text(16, y + 8, upg.label, {
+        fontFamily: 'Orbitron, Courier New',
+        fontSize: '11px', fontStyle: 'bold', color: isMaxed ? '#445566' : '#ffffff',
+      }).setDepth(202);
+
+      // Progress dots
+      let progressStr = '';
+      for (let j = 0; j < upg.max; j++) {
+        progressStr += j < currentLevel ? '●' : '○';
+      }
+      const progressText = this.add.text(16, y + 26, progressStr, {
+        fontFamily: 'monospace', fontSize: '14px', color: '#ffcc00',
+      }).setDepth(202);
+
+      // Buy button
+      const btnColor = isMaxed ? 0x334455 : 0xffcc00;
+      const btnLabel = isMaxed ? 'MAX' : `◆ ${cost}`;
+      const btnBg = this.add.rectangle(W - 60, y + 20, 80, 30, btnColor, 0.15).setDepth(201);
+      const btnBorder = this.add.rectangle(W - 60, y + 20, 80, 30, 0, 0)
+        .setStrokeStyle(1, btnColor, 0.6).setDepth(201);
+      const btnText = this.add.text(W - 60, y + 20, btnLabel, {
+        fontFamily: 'Orbitron, Courier New',
+        fontSize: '10px', fontStyle: 'bold', color: isMaxed ? '#445566' : '#ffcc00',
+      }).setOrigin(0.5).setDepth(202);
+
+      elements.push(cardBg, cardBorder, nameText, progressText, btnBg, btnBorder, btnText);
+
+      if (!isMaxed) {
+        const btnZone = this.add.zone(W - 60, y + 20, 85, 35).setInteractive({ cursor: 'pointer' }).setDepth(203);
+        elements.push(btnZone);
+
+        btnZone.on('pointerover', () => { btnBg.setFillStyle(btnColor, 0.35); });
+        btnZone.on('pointerout',  () => { btnBg.setFillStyle(btnColor, 0.15); });
+        btnZone.on('pointerdown', () => {
+          const shards = meta.totalShards || 0;
+          if (shards >= cost) {
+            meta.totalShards = shards - cost;
+            const step = upg.step || 1;
+            meta[upg.key] = (meta[upg.key] || 0) + step;
+            this._saveMeta(meta);
+            // Refresh
+            elements.forEach(el => el.destroy());
+            this._openMeta();
+          } else {
+            this._showNotEnough(W, H);
+          }
+        });
+      }
+    });
+
+    // Close button
+    const closeBtn = this.add.text(W / 2, H * 0.92, '[ FERMER ]', {
+      fontFamily: 'Orbitron, Courier New',
+      fontSize: '12px', color: '#446677', letterSpacing: 3,
+    }).setOrigin(0.5).setDepth(202).setInteractive({ cursor: 'pointer' });
+    elements.push(closeBtn);
+
+    closeBtn.on('pointerdown', () => {
+      elements.forEach(el => el.destroy());
+    });
+
+    // Also close on overlay click (outside cards)
+    overlay.on('pointerdown', (ptr) => {
+      if (ptr.y > H * 0.88) {
+        elements.forEach(el => el.destroy());
+      }
+    });
+  }
+
+  _showNotEnough(W, H) {
+    const t = this.add.text(W / 2, H * 0.85, 'Pas assez d\'éclats !', {
+      fontFamily: 'Share Tech Mono, Courier New',
+      fontSize: '12px', color: '#ff4466',
+    }).setOrigin(0.5).setDepth(300);
+    this.tweens.add({
+      targets: t, alpha: 0, y: H * 0.82,
+      duration: 1000, delay: 600,
+      onComplete: () => t.destroy()
+    });
   }
 
   _showCredits() {
-    // Simple credits overlay
     const W = this.scale.width, H = this.scale.height;
     const overlay = this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.85);
     const txt = this.add.text(W / 2, H / 2, [
       'SHATTERED REALMS',
       '',
-      'Un roguelite brick-breaker narratif',
+      'Un roguelite brick-breaker',
+      'narratif en portrait',
       '',
       'Propulsé par Phaser 3',
       '',
       'Cliquez pour fermer',
     ].join('\n'), {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '16px',
-      color: '#00e5ff',
-      align: 'center',
-      lineSpacing: 8,
+      fontSize: '14px', color: '#00e5ff', align: 'center', lineSpacing: 6,
     }).setOrigin(0.5);
 
     overlay.setInteractive();
@@ -334,8 +355,10 @@ class MenuScene extends Phaser.Scene {
   }
 
   _loadMeta() {
-    try {
-      return JSON.parse(localStorage.getItem('shattered_meta') || '{}');
-    } catch { return {}; }
+    try { return JSON.parse(localStorage.getItem('shattered_meta') || '{}'); } catch { return {}; }
+  }
+
+  _saveMeta(meta) {
+    try { localStorage.setItem('shattered_meta', JSON.stringify(meta)); } catch {}
   }
 }

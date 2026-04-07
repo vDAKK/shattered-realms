@@ -35,7 +35,7 @@ class NarrativeScene extends Phaser.Scene {
     // Main text area
     this.lineText = this.add.text(W / 2, H / 2, '', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '22px',
+      fontSize: '17px',
       color: '#ccddee',
       align: 'center',
       wordWrap: { width: W * 0.7 },

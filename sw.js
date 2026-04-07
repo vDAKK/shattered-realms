@@ -4,7 +4,7 @@
 //              Network-first pour Phaser CDN
 // ═══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'shattered-realms-v1';
+const CACHE_NAME = 'shattered-realms-v2';
 
 const LOCAL_ASSETS = [
   './',
