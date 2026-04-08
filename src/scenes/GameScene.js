@@ -39,6 +39,8 @@ class GameScene extends Phaser.Scene {
     this.explosiveCounter = 0;
     this.hitstopTimer = 0;
     this.invulnTimer = 0;
+    this.descentInterval = 9000;
+    this.descentTimer = this.descentInterval;
     this.levelingUp = false;
 
     // Combo system
@@ -1407,6 +1409,38 @@ class GameScene extends Phaser.Scene {
     if (this.puDoubleTimer > 0) this.puDoubleTimer -= scaledDelta;
     if (this.laserCooldown > 0) this.laserCooldown -= scaledDelta;
     if (this.invulnTimer > 0) this.invulnTimer -= scaledDelta;
+
+    // ── Brick descent ───────────────────────────────────
+    if (this.ballLaunched && !this.levelingUp && this.bricks.length > 0) {
+      this.descentTimer -= scaledDelta;
+      if (this.descentTimer <= 0) {
+        this._descendBricks();
+        this.descentInterval = Math.max(3500, this.descentInterval - 200);
+        this.descentTimer = this.descentInterval;
+      }
+    }
+  }
+
+  _descendBricks() {
+    const step = BRICK_H + BRICK_PAD_Y;
+    const killY = PADDLE_Y - 80;
+    let touched = false;
+
+    for (const brick of this.bricks) {
+      if (!brick.sprite.visible) continue;
+      brick.sprite.y += step;
+      if (brick.label) brick.label.y += step;
+      if (brick.sprite.y + BRICK_H / 2 >= killY) touched = true;
+    }
+
+    // Camera shake + red flash warning
+    this.cameras.main.shake(120, 0.006);
+    this.cameras.main.flash(80, 255, 40, 40, false);
+
+    if (touched) {
+      this._showFloatingText(GW / 2, GH / 2 - 40, 'SUBMERGÉ!', '#ff2200', 28);
+      this.time.delayedCall(400, () => this._gameOver());
+    }
   }
 
   _updateHUD() {
