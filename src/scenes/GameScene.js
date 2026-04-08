@@ -18,7 +18,7 @@ class GameScene extends Phaser.Scene {
     this.levelData = getLevelData(gs.world, gs.level);
 
     // Post-FX + music
-    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.18, vignetteStrength: 0.04 });
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloom: false, scanlines: false, vignette: true, vignetteStrength: 0.02 });
     if (window.GameMusic) {
       const isBoss = this.levelData && this.levelData.isBoss;
       let track = 'game';
@@ -432,25 +432,29 @@ class GameScene extends Phaser.Scene {
     // World name (top-left)
     this.hudWorldText = this.add.text(8, 8, worldData ? worldData.name : 'MONDE 1', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '13px', color: worldColorStr, fontStyle: 'bold', letterSpacing: 1
+      fontSize: '13px', color: worldColorStr, fontStyle: 'bold', letterSpacing: 1,
+      stroke: '#000000', strokeThickness: 3,
     }).setDepth(11);
 
     // Level indicator
     const levelData = this.levelData;
     this.hudLevelText = this.add.text(8, 24, levelData.isBoss ? '⚡ BOSS' : `Niv ${gs.level}/4`, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '13px', color: '#aaccee', fontStyle: 'bold'
+      fontSize: '13px', color: '#ffffff', fontStyle: 'bold',
+      stroke: '#000000', strokeThickness: 3,
     }).setDepth(11);
 
     // Score (center)
     this.hudScore = this.add.text(GW / 2, 16, '0', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '18px', color: '#ffffff', fontStyle: 'bold'
+      fontSize: '18px', color: '#ffee00', fontStyle: 'bold',
+      stroke: '#000000', strokeThickness: 4,
     }).setOrigin(0.5).setDepth(11);
 
     this.add.text(GW / 2, 34, 'SCORE', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px', color: '#99aabb', letterSpacing: 2
+      fontSize: '11px', color: '#ffffff', letterSpacing: 2,
+      stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5).setDepth(11);
 
     // HP display (top-right)
@@ -460,7 +464,8 @@ class GameScene extends Phaser.Scene {
     // Combo text (below score)
     this.comboText = this.add.text(GW / 2, 42, '', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '13px', color: '#ffcc00', fontStyle: 'bold'
+      fontSize: '13px', color: '#ffcc00', fontStyle: 'bold',
+      stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5).setDepth(11).setAlpha(0);
 
     // ── XP Bar ──────────────────────────────────────────
@@ -480,8 +485,9 @@ class GameScene extends Phaser.Scene {
     this.surchargeBorder = this.add.rectangle(GW / 2, scY, GW - 16, 6, 0x000000, 0).setStrokeStyle(1, 0xff44aa, 0.4).setDepth(10);
     this.surchargeLabel = this.add.text(GW / 2, scY, 'SURCHARGE [E]', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '8px', color: '#ffffff', fontStyle: 'bold', letterSpacing: 2
-    }).setOrigin(0.5).setDepth(11).setAlpha(0.7);
+      fontSize: '8px', color: '#ff88cc', fontStyle: 'bold', letterSpacing: 2,
+      stroke: '#000000', strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(11).setAlpha(0.9);
     // Tap zone over the meter (mobile)
     const scZone = this.add.zone(GW / 2, scY, GW - 16, 18).setInteractive({ cursor: 'pointer' }).setDepth(12);
     scZone.on('pointerdown', (ptr) => {
@@ -498,7 +504,8 @@ class GameScene extends Phaser.Scene {
     // Power-up status bar
     this.puStatusText = this.add.text(GW - 8, 66, '', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px', color: '#00e5ff', align: 'right'
+      fontSize: '11px', color: '#ffee44', align: 'right',
+      stroke: '#000000', strokeThickness: 2,
     }).setOrigin(1, 0).setDepth(11);
 
     // Boss health bar
@@ -507,7 +514,8 @@ class GameScene extends Phaser.Scene {
     // Time dilation indicator
     this.tdIndicator = this.add.text(GW / 2, 80, '', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '12px', color: '#a0a0ff', letterSpacing: 3
+      fontSize: '12px', color: '#aaaaff', letterSpacing: 3,
+      stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5).setAlpha(0).setDepth(11);
   }
 
@@ -520,10 +528,10 @@ class GameScene extends Phaser.Scene {
       const filled = i < gs.hp;
       const heart = this.add.text(x, 8, '♥', {
         fontFamily: 'monospace',
-        fontSize: '14px',
-        color: filled ? '#ff3388' : '#331122',
-        stroke: filled ? '#ff0044' : '#220011',
-        strokeThickness: 1
+        fontSize: '16px',
+        color: filled ? '#ff3388' : '#552233',
+        stroke: '#000000',
+        strokeThickness: 3,
       }).setOrigin(0.5, 0).setDepth(11);
       this.hpGroup.push(heart);
     }
@@ -1815,8 +1823,8 @@ class GameScene extends Phaser.Scene {
   }
 
   _worldBulletTint() {
-    // Bright saturated colors — always visible on dark bg
-    return [0xff2255, 0xff6600, 0xff00ff, 0x00ffaa, 0xffee00, 0xff4488, 0xcc88ff][(window.GameState.world - 1)] || 0xff2255;
+    // All warm/hot colors — maximum contrast on any dark background
+    return [0xff3300, 0xff8800, 0xff00aa, 0xff4400, 0xffcc00, 0xff2266, 0xff6600][(window.GameState.world - 1)] || 0xff3300;
   }
 
   _fireLaser() {
