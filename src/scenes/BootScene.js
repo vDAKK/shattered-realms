@@ -179,6 +179,8 @@ class BootScene extends Phaser.Scene {
     this._genBossTexture('boss_void_lurker',     0xaa00ff, 0x220044, 110, 100);
     this._genBossTexture('boss_circuit_mind',    0x00ff88, 0x002211, 110, 90);
     this._genBossTexture('boss_void_architect',  0xffffff, 0x111111, 120, 110);
+    this._genBossTexture('boss_petrified_queen', 0xffaa33, 0x442200, 120, 100);
+    this._genBossTexture('boss_primordial_idea', 0xe0e0e0, 0x222233, 130, 110);
 
     // ── Power-up icons ────────────────────────────────────
     const puColors = {

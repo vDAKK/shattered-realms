@@ -46,7 +46,7 @@ class GameOverScene extends Phaser.Scene {
     const statsY = H * 0.34;
     const stats = [
       { label: 'SCORE FINAL',      value: gs.score.toString().padStart(6, '0'), color: '#ffcc00' },
-      { label: 'MONDE ATTEINT',    value: `${gs.world} / 5`,                   color: '#00e5ff' },
+      { label: 'MONDE ATTEINT',    value: `${gs.world} / 6`,                   color: '#00e5ff' },
       { label: 'NIVEAU XP',        value: `${gs.xpLevel || 0}`,                color: '#00e5ff' },
       { label: 'BOSS VAINCUS',     value: `${gs.bossesDefeated || 0}`,          color: '#ff4466' },
       { label: 'BRIQUES BRISÉES',  value: `${gs.bricksBroken || 0}`,            color: '#44ff88' },

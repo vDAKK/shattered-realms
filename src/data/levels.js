@@ -1,13 +1,13 @@
 // Level layouts: 14 cols x 10 rows
 // 0=empty, 1-3=normal(1HP), 4-5=hard(2HP), 6-7=ultra(3HP), 8=indestructible, 9=powerup brick
+// secrets: [{col,row}] — hidden bricks; destroy them all (one per realm) to unlock Realm 7
 
 const LEVELS = [
   // ════════════════════════════════════════════
   // MONDE 1 — CAVERNES DE CRISTAL
-  // Thème : formations naturelles, intro douce
   // ════════════════════════════════════════════
 
-  // L1 · Pyramide de diamant — enseignement des rebonds
+  // L1 · Pyramide de diamant
   {
     world: 1, level: 1, isBoss: false,
     grid: [
@@ -25,7 +25,7 @@ const LEVELS = [
     enemies: []
   },
 
-  // L2 · Tours jumelles — apprendre les angles
+  // L2 · Tours jumelles
   {
     world: 1, level: 2, isBoss: false,
     grid: [
@@ -43,7 +43,7 @@ const LEVELS = [
     enemies: []
   },
 
-  // L3 · Damier cristallin — rythme et précision
+  // L3 · Damier cristallin
   {
     world: 1, level: 3, isBoss: false,
     grid: [
@@ -58,7 +58,9 @@ const LEVELS = [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ],
-    enemies: []
+    enemies: [],
+    // ░ Secret #1 : tout en haut à gauche derrière le damier
+    secrets: [{ col: 0, row: 0 }]
   },
 
   // L4 · BOSS — Gardien Cristallin
@@ -82,10 +84,9 @@ const LEVELS = [
 
   // ════════════════════════════════════════════
   // MONDE 2 — FORGE INFERNALE
-  // Thème : chaleur, obstacles solides, ennemis
   // ════════════════════════════════════════════
 
-  // L1 · Vague de lave — sinusoïde
+  // L1 · Vague de lave
   {
     world: 2, level: 1, isBoss: false,
     grid: [
@@ -106,7 +107,7 @@ const LEVELS = [
     ]
   },
 
-  // L2 · Forteresse — portes et tours
+  // L2 · Forteresse
   {
     world: 2, level: 2, isBoss: false,
     grid: [
@@ -127,7 +128,7 @@ const LEVELS = [
     ]
   },
 
-  // L3 · Croix de feu — diagonales
+  // L3 · Croix de feu
   {
     world: 2, level: 3, isBoss: false,
     grid: [
@@ -146,7 +147,9 @@ const LEVELS = [
       { type: 'drifter', col: 1, row: 0 },
       { type: 'shooter', col: 6, row: 0 },
       { type: 'drifter', col: 12, row: 0 },
-    ]
+    ],
+    // ░ Secret #2 : extrême droite, ligne 0
+    secrets: [{ col: 13, row: 0 }]
   },
 
   // L4 · BOSS — Tyran Forgé
@@ -170,10 +173,9 @@ const LEVELS = [
 
   // ════════════════════════════════════════════
   // MONDE 3 — DÉSOLATION DU VIDE
-  // Thème : chaos, îles flottantes, densité
   // ════════════════════════════════════════════
 
-  // L1 · Îles du Vide — espaces aléatoires
+  // L1 · Îles du Vide
   {
     world: 3, level: 1, isBoss: false,
     grid: [
@@ -194,7 +196,7 @@ const LEVELS = [
     ]
   },
 
-  // L2 · Anneaux concentriques — spirale de défense
+  // L2 · Anneaux concentriques
   {
     world: 3, level: 2, isBoss: false,
     grid: [
@@ -213,10 +215,12 @@ const LEVELS = [
       { type: 'shooter', col: 0, row: 0 },
       { type: 'drifter', col: 6, row: 0 },
       { type: 'shooter', col: 13, row: 0 },
-    ]
+    ],
+    // ░ Secret #3 : au centre exact, caché dans le cœur
+    secrets: [{ col: 6, row: 5 }]
   },
 
-  // L3 · Labyrinthe Abyssal — maze serré
+  // L3 · Labyrinthe Abyssal
   {
     world: 3, level: 3, isBoss: false,
     grid: [
@@ -259,13 +263,102 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 4 — CITADELLE DE NÉON
-  // Thème : circuits, grilles denses, haute difficulté
+  // MONDE 4 — JARDINS DE L'OUBLI (NOUVEAU)
+  // Thème : organique fossilisé, ambre, racines
   // ════════════════════════════════════════════
 
-  // L1 · Circuit Imprimé — pistes logiques
+  // L1 · Racines de Verre — branches qui descendent
   {
     world: 4, level: 1, isBoss: false,
+    grid: [
+      [0,4,0,0,0,4,0,0,4,0,0,0,4,0],
+      [4,5,4,0,4,5,4,4,5,4,0,4,5,4],
+      [0,5,6,4,5,6,5,5,6,5,4,6,5,0],
+      [0,0,5,5,9,5,4,4,5,9,5,5,0,0],
+      [0,0,0,4,5,0,0,0,0,5,4,0,0,0],
+      [0,0,0,0,4,0,0,0,0,4,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [
+      { type: 'drifter', col: 6, row: 0 },
+    ]
+  },
+
+  // L2 · Pollen de Néant — symétrie aérée, beaucoup d'ennemis qui tirent
+  {
+    world: 4, level: 2, isBoss: false,
+    grid: [
+      [4,0,4,0,4,0,9,9,0,4,0,4,0,4],
+      [0,4,0,4,0,4,7,7,4,0,4,0,4,0],
+      [8,0,6,0,6,0,8,8,0,6,0,6,0,8],
+      [0,8,0,6,0,6,0,0,6,0,6,0,8,0],
+      [0,0,5,0,5,0,0,0,0,5,0,5,0,0],
+      [0,0,0,4,0,4,0,0,4,0,4,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [
+      { type: 'shooter', col: 3, row: 0 },
+      { type: 'shooter', col: 10, row: 0 },
+      { type: 'drifter', col: 6, row: 0 },
+    ],
+    // ░ Secret #4 : caché dans l'angle où aucun joueur ne tire
+    secrets: [{ col: 0, row: 4 }]
+  },
+
+  // L3 · Serre Pétrifiée — ruche dense
+  {
+    world: 4, level: 3, isBoss: false,
+    grid: [
+      [6,6,0,6,6,0,6,6,0,6,6,0,6,6],
+      [5,5,4,5,5,4,5,5,4,5,5,4,5,5],
+      [4,4,8,4,4,8,9,9,8,4,4,8,4,4],
+      [5,5,4,5,5,4,5,5,4,5,5,4,5,5],
+      [6,6,0,6,6,0,7,7,0,6,6,0,6,6],
+      [0,0,0,4,4,0,4,4,0,4,4,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [
+      { type: 'guardian', col: 3, row: 0 },
+      { type: 'shooter', col: 7, row: 0 },
+      { type: 'guardian', col: 10, row: 0 },
+    ]
+  },
+
+  // L4 · BOSS — La Reine Pétrifiée
+  {
+    world: 4, level: 4, isBoss: true,
+    grid: [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,5,5,0,0,0,0,0,0,5,5,0,0],
+      [0,5,6,6,5,0,0,0,0,5,6,6,5,0],
+      [0,5,6,7,6,5,0,0,5,6,7,6,5,0],
+      [0,0,5,6,5,0,0,0,0,5,6,5,0,0],
+      [0,0,0,5,0,0,0,0,0,0,5,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [],
+    boss: { type: 'petrified_queen', hp: 48, speed: 110, fireRate: 1250 }
+  },
+
+  // ════════════════════════════════════════════
+  // MONDE 5 — CITADELLE DE NÉON
+  // ════════════════════════════════════════════
+
+  // L1 · Circuit Imprimé
+  {
+    world: 5, level: 1, isBoss: false,
     grid: [
       [8,5,5,5,5,5,5,5,5,5,5,5,5,8],
       [5,0,0,8,0,0,0,0,0,8,0,0,0,5],
@@ -285,9 +378,9 @@ const LEVELS = [
     ]
   },
 
-  // L2 · Labyrinthe Logique — murs et passages
+  // L2 · Labyrinthe Logique
   {
-    world: 4, level: 2, isBoss: false,
+    world: 5, level: 2, isBoss: false,
     grid: [
       [8,8,8,8,8,8,8,8,8,8,8,8,8,8],
       [8,6,6,6,6,6,8,0,8,6,6,6,6,8],
@@ -305,12 +398,14 @@ const LEVELS = [
       { type: 'shooter', col: 6, row: 0 },
       { type: 'shooter', col: 7, row: 0 },
       { type: 'guardian', col: 12, row: 0 },
-    ]
+    ],
+    // ░ Secret #5 : centre haut, dans le couloir vertical
+    secrets: [{ col: 7, row: 0 }]
   },
 
-  // L3 · Protocole Extrême — densité maximale
+  // L3 · Protocole Extrême
   {
-    world: 4, level: 3, isBoss: false,
+    world: 5, level: 3, isBoss: false,
     grid: [
       [9,8,9,8,9,8,9,8,9,8,9,8,9,8],
       [8,7,8,7,8,7,8,7,8,7,8,7,8,7],
@@ -333,7 +428,7 @@ const LEVELS = [
 
   // L4 · BOSS — L'Esprit-Circuit
   {
-    world: 4, level: 4, isBoss: true,
+    world: 5, level: 4, isBoss: true,
     grid: [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,8,8,8,8,8,8,8,8,8,8,8,8,0],
@@ -351,10 +446,10 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 5 — CŒUR DU VIDE (Boss Final)
+  // MONDE 6 — CŒUR DU VIDE (Boss final canonique)
   // ════════════════════════════════════════════
   {
-    world: 5, level: 1, isBoss: true,
+    world: 6, level: 1, isBoss: true,
     grid: [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -369,9 +464,97 @@ const LEVELS = [
     ],
     enemies: [],
     boss: { type: 'void_architect', hp: 80, speed: 125, fireRate: 950 }
+  },
+
+  // ════════════════════════════════════════════
+  // MONDE 7 — ARCHIVES DE L'OUBLI (SECRET)
+  // Débloqué uniquement après les 5 fragments secrets
+  // ════════════════════════════════════════════
+
+  // L1 · Page Blanche — minimaliste, vide encadré
+  {
+    world: 7, level: 1, isBoss: false,
+    grid: [
+      [8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+      [8,0,0,0,0,0,0,0,0,0,0,0,0,8],
+      [8,0,6,6,6,6,9,9,6,6,6,6,0,8],
+      [8,0,6,0,0,0,0,0,0,0,0,6,0,8],
+      [8,0,6,0,4,4,4,4,4,4,0,6,0,8],
+      [8,0,0,0,4,9,9,9,9,4,0,0,0,8],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [{ type: 'shooter', col: 6, row: 0 }]
+  },
+
+  // L2 · Marges Vivantes — colonnes étroites
+  {
+    world: 7, level: 2, isBoss: false,
+    grid: [
+      [7,0,0,7,0,0,7,7,0,0,7,0,0,7],
+      [6,0,0,6,0,0,6,6,0,0,6,0,0,6],
+      [5,0,0,5,0,9,5,5,9,0,5,0,0,5],
+      [4,0,0,4,0,0,4,4,0,0,4,0,0,4],
+      [5,0,0,5,0,0,5,5,0,0,5,0,0,5],
+      [6,0,0,6,0,0,6,6,0,0,6,0,0,6],
+      [7,0,0,7,0,0,7,7,0,0,7,0,0,7],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [
+      { type: 'guardian', col: 3, row: 0 },
+      { type: 'guardian', col: 10, row: 0 },
+    ]
+  },
+
+  // L3 · Paragraphe Final — cascade asymétrique
+  {
+    world: 7, level: 3, isBoss: false,
+    grid: [
+      [6,6,6,6,6,6,6,0,0,0,0,0,0,0],
+      [0,5,5,5,5,5,5,5,0,0,0,0,0,0],
+      [0,0,4,4,4,4,4,4,4,0,0,0,0,0],
+      [0,0,0,9,9,7,7,9,9,7,0,0,0,0],
+      [0,0,0,0,0,4,4,4,4,4,4,0,0,0],
+      [0,0,0,0,0,0,5,5,5,5,5,5,0,0],
+      [0,0,0,0,0,0,0,6,6,6,6,6,6,6],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [
+      { type: 'shooter', col: 2, row: 0 },
+      { type: 'shooter', col: 11, row: 0 },
+      { type: 'drifter', col: 6, row: 0 },
+    ]
+  },
+
+  // L4 · BOSS — L'Idée Primordiale
+  {
+    world: 7, level: 4, isBoss: true,
+    grid: [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ],
+    enemies: [],
+    boss: { type: 'primordial_idea', hp: 100, speed: 140, fireRate: 850 }
   }
 ];
 
 function getLevelData(world, level) {
   return LEVELS.find(l => l.world === world && l.level === level) || LEVELS[0];
 }
+
+// Total number of secret fragments needed to unlock Realm 7
+const TOTAL_SECRETS = 5;

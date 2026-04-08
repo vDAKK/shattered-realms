@@ -45,16 +45,22 @@ class MenuScene extends Phaser.Scene {
       { name: 'CRISTAL', color: '#00e5ff' },
       { name: 'FORGE',   color: '#ff4400' },
       { name: 'VIDE',    color: '#aa00ff' },
+      { name: 'JARDINS', color: '#ffaa33' },
       { name: 'NÉON',    color: '#00ff88' },
+      { name: 'CŒUR',    color: '#ffffff' },
     ];
+    let archivesUnlocked = false;
+    try { archivesUnlocked = localStorage.getItem('sr_archives_unlocked') === '1'; } catch (e) {}
+    if (archivesUnlocked) worlds.push({ name: 'ARCHIVES', color: '#e0e0e0' });
     const stripY = titleY + 110;
+    const stepX = (W - 40) / worlds.length;
     worlds.forEach((w, i) => {
-      const x = W * 0.15 + i * (W * 0.23);
+      const x = 20 + stepX / 2 + i * stepX;
       this.add.text(x, stripY, w.name, {
         fontFamily: 'Orbitron, Courier New',
-        fontSize: '9px', color: w.color, letterSpacing: 2,
+        fontSize: '9px', color: w.color, letterSpacing: 1,
       }).setOrigin(0.5);
-      const line = this.add.rectangle(x, stripY + 12, 80, 1, parseInt(w.color.replace('#', '0x')), 0.6);
+      const line = this.add.rectangle(x, stripY + 12, stepX - 8, 1, parseInt(w.color.replace('#', '0x')), 0.6);
       this.tweens.add({
         targets: line, alpha: { from: 0.2, to: 0.9 },
         duration: 1200 + i * 300, yoyo: true, repeat: -1
@@ -62,10 +68,18 @@ class MenuScene extends Phaser.Scene {
     });
 
     // ── Menu buttons ──────────────────────────────────────
-    const btnY = H * 0.46;
-    this._createButton(W / 2, btnY,       'NOUVELLE PARTIE', '#00e5ff', () => this._startGame());
-    this._createButton(W / 2, btnY + 55,  'AMÉLIORATIONS',   '#ffcc00', () => this._openMeta());
-    this._createButton(W / 2, btnY + 110, 'CRÉDITS',          '#888888', () => this._showCredits());
+    const hasSave = this._hasSavedRun();
+    const btnY = H * 0.44;
+    let row = 0;
+    if (hasSave) {
+      const save = this._loadSavedRun();
+      const label = save ? `REPRENDRE  (M${save.world}-${save.level})` : 'REPRENDRE';
+      this._createButton(W / 2, btnY + row * 55, label, '#44ff88', () => this._resumeRun());
+      row++;
+    }
+    this._createButton(W / 2, btnY + row * 55, 'NOUVELLE PARTIE', '#00e5ff', () => this._startGame()); row++;
+    this._createButton(W / 2, btnY + row * 55, 'AMÉLIORATIONS',   '#ffcc00', () => this._openMeta()); row++;
+    this._createButton(W / 2, btnY + row * 55, 'CRÉDITS',          '#888888', () => this._showCredits());
 
     // ── Meta stats preview ────────────────────────────────
     const meta = this._loadMeta();
@@ -182,7 +196,51 @@ class MenuScene extends Phaser.Scene {
     this.tweens.add({ targets: scanline, y: H + 2, duration: 4000, repeat: -1, delay: 2000 });
   }
 
+  _hasSavedRun() {
+    try { return !!localStorage.getItem('sr_run'); } catch (e) { return false; }
+  }
+
+  _loadSavedRun() {
+    try { return JSON.parse(localStorage.getItem('sr_run') || 'null'); } catch (e) { return null; }
+  }
+
+  _resumeRun() {
+    const snap = this._loadSavedRun();
+    if (!snap) { this._startGame(); return; }
+    const upgrades = (snap.upgradeIds || [])
+      .map(id => UPGRADES.find(u => u.id === id))
+      .filter(Boolean);
+    window.GameState = {
+      world: snap.world, level: snap.level, score: snap.score || 0,
+      hp: snap.hp, maxHp: snap.maxHp,
+      voidShards: snap.voidShards || 0,
+      upgrades, // already-applied; do NOT re-call .apply()
+      ballSpeed: snap.ballSpeed, paddleWidth: snap.paddleWidth, startBalls: snap.startBalls,
+      hasLaser: !!snap.hasLaser, netBounces: snap.netBounces || 0,
+      voidShieldCharges: snap.voidShieldCharges || 0,
+      timeDilationCharges: snap.timeDilationCharges || 0,
+      fireCoreDuration: snap.fireCoreDuration || 0,
+      ghostDuration: snap.ghostDuration || 0,
+      chainChance: snap.chainChance || 0,
+      hasMagnet: !!snap.hasMagnet,
+      explosiveEvery: snap.explosiveEvery || 0,
+      bricksBroken: snap.bricksBroken || 0,
+      bossesDefeated: snap.bossesDefeated || 0,
+      enemiesKilled: snap.enemiesKilled || 0,
+      xp: snap.xp || 0, xpLevel: snap.xpLevel || 0,
+      maxCombo: snap.maxCombo || 0,
+      piercingCount: snap.piercingCount || 0,
+      scoreMult: snap.scoreMult || 1,
+      puDurationMult: snap.puDurationMult || 1,
+      dropLuckMult: snap.dropLuckMult || 1,
+      metaUpgrades: snap.metaUpgrades || this._loadMeta(),
+    };
+    this.cameras.main.fadeOut(400, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('GameScene'));
+  }
+
   _startGame() {
+    try { localStorage.removeItem('sr_run'); } catch (e) {}
     const meta = this._loadMeta();
     window.GameState = {
       world: 1, level: 1, score: 0,

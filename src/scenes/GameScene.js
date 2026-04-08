@@ -85,6 +85,9 @@ class GameScene extends Phaser.Scene {
     this._buildStarField();
     this._buildBiomeEffects();
 
+    // ── Auto-save the run state at the start of each level ──
+    this._saveRun();
+
     // ── HUD ─────────────────────────────────────────────
     this._buildHUD();
 
@@ -326,7 +329,7 @@ class GameScene extends Phaser.Scene {
   }
 
   _buildBackground() {
-    const worldColors = [null, 0x020818, 0x0f0300, 0x050008, 0x000a03, 0x030306];
+    const worldColors = [null, 0x020818, 0x0f0300, 0x050008, 0x100600, 0x000a03, 0x030306, 0x0a0a0c];
     const wc = worldColors[window.GameState.world] || 0x020810;
     this.add.rectangle(GW / 2, GH / 2, GW, GH, wc);
     this.add.rectangle(GW / 2, 24, GW, 48, 0x000000, 0.4);
@@ -346,8 +349,10 @@ class GameScene extends Phaser.Scene {
       case 1: this._biomeIce();   break;
       case 2: this._biomeForge(); break;
       case 3: this._biomeVoid();  break;
-      case 4: this._biomeNeon();  break;
-      case 5: this._biomeFinal(); break;
+      case 4: this._biomeIce();   break; // Jardins — réutilise particules ambiantes
+      case 5: this._biomeNeon();  break;
+      case 6: this._biomeFinal(); break;
+      case 7: this._biomeFinal(); break;
     }
   }
 
@@ -556,7 +561,16 @@ class GameScene extends Phaser.Scene {
 
         const sprite = this.add.image(x, y, `brick_${cell}`);
 
-        const brick = { sprite, hp, maxHp, indestructible, cell, x, y };
+        const brick = { sprite, hp, maxHp, indestructible, cell, x, y, col: colIdx, row: rowIdx };
+        // Mark secret bricks (subtle golden glow)
+        if (this.levelData.secrets && this.levelData.secrets.some(s => s.col === colIdx && s.row === rowIdx)) {
+          brick.isSecret = true;
+          sprite.setTint(0xffe066);
+          this.tweens.add({
+            targets: sprite, alpha: { from: 1, to: 0.55 },
+            duration: 700, yoyo: true, repeat: -1,
+          });
+        }
         this.bricks.push(brick);
 
         sprite.setAlpha(0).setY(y - 20);
@@ -671,6 +685,8 @@ class GameScene extends Phaser.Scene {
       void_lurker:    'boss_void_lurker',
       circuit_mind:   'boss_circuit_mind',
       void_architect: 'boss_void_architect',
+      petrified_queen:  'boss_petrified_queen',
+      primordial_idea:  'boss_primordial_idea',
     };
     const bossKey = keyMap[bossData.type] || 'boss_crystal_warden';
 
@@ -939,6 +955,10 @@ class GameScene extends Phaser.Scene {
     }
 
     if (brick.hp <= 0) {
+      // Secret fragment collected
+      if (brick.isSecret) {
+        this._collectSecret(brick.sprite.x, brick.sprite.y);
+      }
       // XP gain
       const xpGain = Math.floor((brick.maxHp * 4 + this.combo) * (this.puDoubleTimer > 0 ? 2 : 1));
       this._addXP(xpGain, brick.sprite.x, brick.sprite.y);
@@ -1219,15 +1239,64 @@ class GameScene extends Phaser.Scene {
   _updateBoss(scaledDelta) {
     const boss = this.boss;
     const dt = scaledDelta / 1000;
+    const t = this.time.now;
 
     if (boss.hitCooldown > 0) boss.hitCooldown -= scaledDelta;
 
-    boss.sprite.x += boss.speed * boss.dir * dt;
-    if (boss.sprite.x > GW - 60) boss.dir = -1;
-    if (boss.sprite.x < 60) boss.dir = 1;
-
-    if (boss.phase >= 2) {
-      boss.sprite.y = 140 + Math.sin(this.time.now * 0.001) * 25;
+    // ── Per-type movement ─────────────────────────────────
+    switch (boss.type) {
+      case 'petrified_queen': {
+        // Lent, ample, "respiration" sinusoïdale + dash latéral en phase 3
+        const sway = Math.sin(t * 0.0012) * (GW * 0.32);
+        boss.sprite.x = GW / 2 + sway;
+        boss.sprite.y = 150 + Math.sin(t * 0.0018) * 28;
+        if (boss.phase >= 3) {
+          // Dash imprévisible toutes les 1.6s
+          boss._dashCd = (boss._dashCd || 0) - scaledDelta;
+          if (boss._dashCd <= 0) {
+            boss._dashCd = 1600;
+            const targetX = Phaser.Math.Clamp(this.paddle.x, 60, GW - 60);
+            this.tweens.add({ targets: boss.sprite, x: targetX, duration: 280, ease: 'Cubic.easeOut' });
+            this._emitParticles(boss.sprite.x, boss.sprite.y, 0xffaa33, 14);
+          }
+        }
+        break;
+      }
+      case 'primordial_idea': {
+        // Téléportation glitchée + lévitation chaotique
+        boss._tpCd = (boss._tpCd || 1500) - scaledDelta;
+        if (boss._tpCd <= 0) {
+          boss._tpCd = boss.phase >= 3 ? 1100 : boss.phase >= 2 ? 1500 : 2000;
+          // Flash white, fade out, teleport, fade in
+          this._emitParticles(boss.sprite.x, boss.sprite.y, 0xffffff, 18);
+          const newX = Phaser.Math.Between(80, GW - 80);
+          const newY = Phaser.Math.Between(110, 220);
+          this.tweens.add({
+            targets: boss.sprite, alpha: 0.1, duration: 90,
+            onComplete: () => {
+              boss.sprite.x = newX;
+              boss.sprite.y = newY;
+              this._emitParticles(newX, newY, 0xffffff, 18);
+              this.tweens.add({ targets: boss.sprite, alpha: 1, duration: 120 });
+              // Fire a circular burst right after teleport
+              this._burstFire(boss, boss.phase >= 2 ? 12 : 8);
+            }
+          });
+        }
+        // Slight jitter
+        boss.sprite.x += Math.sin(t * 0.02) * 0.6;
+        boss.sprite.y += Math.cos(t * 0.018) * 0.4;
+        break;
+      }
+      default: {
+        // Default: horizontal patrol + vertical bob
+        boss.sprite.x += boss.speed * boss.dir * dt;
+        if (boss.sprite.x > GW - 60) boss.dir = -1;
+        if (boss.sprite.x < 60) boss.dir = 1;
+        if (boss.phase >= 2) {
+          boss.sprite.y = 140 + Math.sin(t * 0.001) * 25;
+        }
+      }
     }
 
     boss.fireTimer -= scaledDelta;
@@ -1236,7 +1305,25 @@ class GameScene extends Phaser.Scene {
       this._bossFire(boss);
     }
 
-    boss.sprite.alpha = 0.85 + Math.sin(this.time.now * 0.004) * 0.15;
+    boss.sprite.alpha = Math.max(boss.sprite.alpha, 0.85) + Math.sin(t * 0.004) * 0.06;
+  }
+
+  // Circular bullet burst — used by primordial_idea
+  _burstFire(boss, count) {
+    const speed = 240 + boss.phase * 50;
+    const tint = this._bossColor(boss.type);
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + (boss._burstOffset || 0);
+      const sprite = this.add.image(boss.sprite.x, boss.sprite.y, 'enemy_bullet')
+        .setScale(1.6).setTint(tint);
+      this.enemyBullets.push({
+        sprite,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        homing: false,
+      });
+    }
+    boss._burstOffset = (boss._burstOffset || 0) + 0.3;
   }
 
   _tickTimers(scaledDelta) {
@@ -1590,6 +1677,74 @@ class GameScene extends Phaser.Scene {
   }
 
   _bossFire(boss) {
+    const tint = this._bossColor(boss.type);
+
+    // ── Petrified Queen — large wave of slow homing pollen + tracking spit ──
+    if (boss.type === 'petrified_queen') {
+      const waveCount = boss.phase >= 3 ? 9 : boss.phase >= 2 ? 7 : 5;
+      const speed = 170 + boss.phase * 35;
+      // Downward fan
+      for (let i = 0; i < waveCount; i++) {
+        const t = (i / (waveCount - 1)) - 0.5; // -0.5..0.5
+        const angle = Math.PI / 2 + t * 1.4;
+        const sprite = this.add.image(boss.sprite.x, boss.sprite.y + 40, 'enemy_bullet')
+          .setScale(1.5).setTint(tint);
+        this.enemyBullets.push({
+          sprite,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          homing: boss.phase >= 3 && (i === 0 || i === waveCount - 1),
+        });
+      }
+      // Aimed spit at the paddle (always)
+      const dx = this.paddle.x - boss.sprite.x;
+      const dy = PADDLE_Y - boss.sprite.y;
+      const aim = Math.atan2(dy, dx);
+      const aimedSprite = this.add.image(boss.sprite.x, boss.sprite.y + 40, 'enemy_bullet')
+        .setScale(2).setTint(0xff8800);
+      this.enemyBullets.push({
+        sprite: aimedSprite,
+        vx: Math.cos(aim) * (speed + 80),
+        vy: Math.sin(aim) * (speed + 80),
+        homing: boss.phase >= 2,
+      });
+      return;
+    }
+
+    // ── Primordial Idea — spinning spiral, accelerates per phase ──
+    if (boss.type === 'primordial_idea') {
+      const arms = boss.phase >= 3 ? 5 : boss.phase >= 2 ? 4 : 3;
+      const speed = 230 + boss.phase * 40;
+      boss._spiralAngle = (boss._spiralAngle || 0) + 0.5;
+      for (let i = 0; i < arms; i++) {
+        const angle = boss._spiralAngle + (i / arms) * Math.PI * 2;
+        const sprite = this.add.image(boss.sprite.x, boss.sprite.y, 'enemy_bullet')
+          .setScale(1.4).setTint(tint);
+        this.enemyBullets.push({
+          sprite,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          homing: false,
+        });
+      }
+      // Phase 3: also lob a homing missile at the paddle
+      if (boss.phase >= 3) {
+        const dx = this.paddle.x - boss.sprite.x;
+        const dy = PADDLE_Y - boss.sprite.y;
+        const aim = Math.atan2(dy, dx);
+        const sprite = this.add.image(boss.sprite.x, boss.sprite.y, 'enemy_bullet')
+          .setScale(2.2).setTint(0xff44aa);
+        this.enemyBullets.push({
+          sprite,
+          vx: Math.cos(aim) * 200,
+          vy: Math.sin(aim) * 200,
+          homing: true,
+        });
+      }
+      return;
+    }
+
+    // ── Default boss fire ──
     const numShots = boss.phase >= 3 ? 5 : boss.phase >= 2 ? 3 : 1;
     const speed = 220 + boss.phase * 60;
 
@@ -1603,7 +1758,7 @@ class GameScene extends Phaser.Scene {
       const angle = baseAngle + spread;
 
       const sprite = this.add.image(boss.sprite.x, boss.sprite.y + 45, 'enemy_bullet')
-        .setScale(1.5).setTint(this._bossColor(boss.type));
+        .setScale(1.5).setTint(tint);
 
       this.enemyBullets.push({
         sprite,
@@ -1615,12 +1770,12 @@ class GameScene extends Phaser.Scene {
   }
 
   _bossColor(type) {
-    const map = { crystal_warden: 0x00ccff, forge_tyrant: 0xff6600, void_lurker: 0xcc00ff, circuit_mind: 0x00ff88, void_architect: 0xffffff };
+    const map = { crystal_warden: 0x00ccff, forge_tyrant: 0xff6600, void_lurker: 0xcc00ff, circuit_mind: 0x00ff88, void_architect: 0xffffff, petrified_queen: 0xffaa33, primordial_idea: 0xe0e0e0 };
     return map[type] || 0xff4400;
   }
 
   _worldBulletTint() {
-    return [0xff4400, 0x00ccff, 0xff6600, 0xcc00ff, 0x00ff88][(window.GameState.world - 1)] || 0xff4400;
+    return [0x00ccff, 0xff6600, 0xcc00ff, 0xffaa33, 0x00ff88, 0xffffff, 0xe0e0e0][(window.GameState.world - 1)] || 0xff4400;
   }
 
   _fireLaser() {
@@ -1894,15 +2049,80 @@ class GameScene extends Phaser.Scene {
     });
   }
 
+  _collectSecret(x, y) {
+    let collected = 0;
+    try { collected = parseInt(localStorage.getItem('sr_secrets') || '0', 10) || 0; } catch (e) {}
+    collected++;
+    try { localStorage.setItem('sr_secrets', String(collected)); } catch (e) {}
+
+    this._showFloatingText(x, y - 20, '◆ FRAGMENT SECRET ◆', '#ffe066', 18);
+    this._showFloatingText(GW / 2, 100, `${collected} / ${TOTAL_SECRETS}`, '#ffe066', 22);
+    this._emitParticles(x, y, 0xffe066, 30);
+    this.cameras.main.flash(200, 255, 220, 100, false);
+    if (window.SFX) window.SFX.play('levelUp');
+
+    if (collected >= TOTAL_SECRETS) {
+      try { localStorage.setItem('sr_archives_unlocked', '1'); } catch (e) {}
+      this._showFloatingText(GW / 2, GH / 2, 'ARCHIVES DÉVERROUILLÉES', '#ffffff', 20);
+    }
+  }
+
+  _archivesUnlocked() {
+    try { return localStorage.getItem('sr_archives_unlocked') === '1'; } catch (e) { return false; }
+  }
+
+  _saveRun() {
+    const gs = window.GameState;
+    if (!gs) return;
+    try {
+      const snap = {
+        world: gs.world, level: gs.level,
+        score: gs.score, hp: gs.hp, maxHp: gs.maxHp,
+        voidShards: gs.voidShards,
+        upgradeIds: (gs.upgrades || []).map(u => u.id),
+        ballSpeed: gs.ballSpeed, paddleWidth: gs.paddleWidth, startBalls: gs.startBalls,
+        hasLaser: gs.hasLaser, netBounces: gs.netBounces,
+        voidShieldCharges: gs.voidShieldCharges, timeDilationCharges: gs.timeDilationCharges,
+        fireCoreDuration: gs.fireCoreDuration, ghostDuration: gs.ghostDuration,
+        chainChance: gs.chainChance, hasMagnet: gs.hasMagnet, explosiveEvery: gs.explosiveEvery,
+        bricksBroken: gs.bricksBroken, bossesDefeated: gs.bossesDefeated, enemiesKilled: gs.enemiesKilled,
+        xp: gs.xp, xpLevel: gs.xpLevel, maxCombo: gs.maxCombo,
+        piercingCount: gs.piercingCount, scoreMult: gs.scoreMult,
+        puDurationMult: gs.puDurationMult, dropLuckMult: gs.dropLuckMult,
+        metaUpgrades: gs.metaUpgrades || null,
+      };
+      localStorage.setItem('sr_run', JSON.stringify(snap));
+    } catch (e) {}
+  }
+
+  _clearRun() {
+    try { localStorage.removeItem('sr_run'); } catch (e) {}
+  }
+
   _advanceLevel() {
     const gs = window.GameState;
     gs.level++;
+    this._saveRun();
 
-    if (gs.level > 4) {
+    // Realm-specific level counts
+    const maxLevel = (gs.world === 6) ? 1 : 4;
+
+    if (gs.level > maxLevel) {
       gs.world++;
       gs.level = 1;
 
-      if (gs.world > 5) {
+      // After Architect (world 6): branch to Archives if unlocked, else Victory
+      if (gs.world === 7) {
+        if (this._archivesUnlocked()) {
+          // Continue into Realm 7
+        } else {
+          this.scene.start('VictoryScene');
+          return;
+        }
+      }
+
+      if (gs.world > 7) {
+        this._clearRun();
         this.scene.start('VictoryScene');
         return;
       }
@@ -1926,6 +2146,7 @@ class GameScene extends Phaser.Scene {
 
   _gameOver() {
     this.levelComplete = true;
+    this._clearRun();
     this.cameras.main.fadeOut(600, 100, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start('GameOverScene');

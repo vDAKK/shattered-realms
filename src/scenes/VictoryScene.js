@@ -65,7 +65,7 @@ class VictoryScene extends Phaser.Scene {
       const statsY = H * 0.30;
       const stats = [
         { label: 'SCORE LÉGENDAIRE', value: gs.score.toString().padStart(7, '0'), color: '#ffcc00' },
-        { label: 'BOSS VAINCUS',     value: `${gs.bossesDefeated || 5} / 5`,      color: '#ff4466' },
+        { label: 'BOSS VAINCUS',     value: `${gs.bossesDefeated || 6} / 6`,      color: '#ff4466' },
         { label: 'BRIQUES BRISÉES',  value: `${gs.bricksBroken || 0}`,            color: '#44ff88' },
         { label: 'ENNEMIS TUÉS',     value: `${gs.enemiesKilled || 0}`,           color: '#ff88ff' },
         { label: 'NIVEAU XP',        value: `${gs.xpLevel || 0}`,                 color: '#00e5ff' },
