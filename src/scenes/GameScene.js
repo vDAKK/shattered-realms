@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-//  SHATTERED REALMS — GameScene (Portrait + Roguelite)
+//  SHATTERED REALMS : GameScene (Portrait + Roguelite)
 // ═══════════════════════════════════════════════════════
 const GW = 480, GH = 854;
 const BRICK_W = 30, BRICK_H = 14;
@@ -349,7 +349,7 @@ class GameScene extends Phaser.Scene {
       case 1: this._biomeIce();   break;
       case 2: this._biomeForge(); break;
       case 3: this._biomeVoid();  break;
-      case 4: this._biomeIce();   break; // Jardins — réutilise particules ambiantes
+      case 4: this._biomeIce();   break; // Jardins : réutilise particules ambiantes
       case 5: this._biomeNeon();  break;
       case 6: this._biomeFinal(); break;
       case 7: this._biomeFinal(); break;
@@ -930,7 +930,7 @@ class GameScene extends Phaser.Scene {
     if (window.SFX) window.SFX.play(brick.hp <= 0 ? 'brickBreak' : 'brickHit', { minGap: 0.015 });
     this.bricksBrokenThisLevel++;
 
-    // Combo-driven ball acceleration — every brick destroyed makes the game more nervous
+    // Combo-driven ball acceleration : every brick destroyed makes the game more nervous
     if (brick.hp <= 0) {
       const targetMult = Math.min(1 + this.combo * 0.025, 1.7);
       const targetSpeed = gs.ballSpeed * targetMult;
@@ -963,7 +963,7 @@ class GameScene extends Phaser.Scene {
       const xpGain = Math.floor((brick.maxHp * 4 + this.combo) * (this.puDoubleTimer > 0 ? 2 : 1));
       this._addXP(xpGain, brick.sprite.x, brick.sprite.y);
 
-      // Destroyed effects — JUICE
+      // Destroyed effects : JUICE
       const color = this._brickColor(brick.cell);
       this._emitParticles(brick.sprite.x, brick.sprite.y, color, 18);
       this._emitParticles(brick.sprite.x, brick.sprite.y, 0xffffff, 6);
@@ -984,7 +984,7 @@ class GameScene extends Phaser.Scene {
         );
       }
 
-      // Hitstop — only on combo milestones or tough bricks, never stacked
+      // Hitstop : only on combo milestones or tough bricks, never stacked
       // (rapid-fire kills like minigun were chaining 60ms freezes back-to-back)
       let stop = 0;
       if (this.combo > 0 && this.combo % 10 === 0) stop = 35;
@@ -1025,7 +1025,7 @@ class GameScene extends Phaser.Scene {
       brick.sprite.setTexture(`brick_${brick.cell}_cracked`);
       this._emitParticles(brick.sprite.x, brick.sprite.y, this._brickColor(brick.cell), 5);
       this.cameras.main.shake(50, 0.004);
-      // No hitstop on simple cracks — only on destruction. Avoids minigun freeze.
+      // No hitstop on simple cracks : only on destruction. Avoids minigun freeze.
     }
   }
 
@@ -1308,7 +1308,7 @@ class GameScene extends Phaser.Scene {
     boss.sprite.alpha = Math.max(boss.sprite.alpha, 0.85) + Math.sin(t * 0.004) * 0.06;
   }
 
-  // Circular bullet burst — used by primordial_idea
+  // Circular bullet burst : used by primordial_idea
   _burstFire(boss, count) {
     const speed = 240 + boss.phase * 50;
     const tint = this._bossColor(boss.type);
@@ -1679,7 +1679,7 @@ class GameScene extends Phaser.Scene {
   _bossFire(boss) {
     const tint = this._bossColor(boss.type);
 
-    // ── Petrified Queen — large wave of slow homing pollen + tracking spit ──
+    // ── Petrified Queen : large wave of slow homing pollen + tracking spit ──
     if (boss.type === 'petrified_queen') {
       const waveCount = boss.phase >= 3 ? 9 : boss.phase >= 2 ? 7 : 5;
       const speed = 170 + boss.phase * 35;
@@ -1711,7 +1711,7 @@ class GameScene extends Phaser.Scene {
       return;
     }
 
-    // ── Primordial Idea — spinning spiral, accelerates per phase ──
+    // ── Primordial Idea : spinning spiral, accelerates per phase ──
     if (boss.type === 'primordial_idea') {
       const arms = boss.phase >= 3 ? 5 : boss.phase >= 2 ? 4 : 3;
       const speed = 230 + boss.phase * 40;
@@ -2140,7 +2140,7 @@ class GameScene extends Phaser.Scene {
       }
     }
 
-    // Go directly to next level — no UpgradeScene!
+    // Go directly to next level : no UpgradeScene!
     this.scene.start('GameScene');
   }
 

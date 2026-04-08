@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════
-//  SFX — Procedural sound effects (WebAudio)
-//  window.SFX.play('name') — all synths, no assets
+//  SFX : Procedural sound effects (WebAudio)
+//  window.SFX.play('name') : all synths, no assets
 // ═══════════════════════════════════════════════════════
 
 (function () {
@@ -91,25 +91,25 @@
 
   // ── Sound definitions ──────────────────────────────────
   const SFX_DEFS = {
-    // Ball hitting the paddle — soft woody thump
+    // Ball hitting the paddle : soft woody thump
     paddleHit(ctx, dst, t) {
       tone(ctx, dst, 320, 0.09, 0.3, 'triangle', t, 180);
       tone(ctx, dst, 650, 0.05, 0.1, 'sine', t, 400);
     },
 
-    // Ball hitting a brick — crisp tick
+    // Ball hitting a brick : crisp tick
     brickHit(ctx, dst, t, opts) {
       const pitch = opts.pitch || 1;
       tone(ctx, dst, 880 * pitch, 0.06, 0.22, 'square', t, 1200 * pitch);
     },
 
-    // Brick destroyed — shatter
+    // Brick destroyed : shatter
     brickBreak(ctx, dst, t) {
       tone(ctx, dst, 600, 0.12, 0.25, 'triangle', t, 180);
       noise(ctx, dst, 0.15, 0.18, t, { type: 'highpass', freq: 2500, q: 1 });
     },
 
-    // Wall hit — soft bonk
+    // Wall hit : soft bonk
     wallHit(ctx, dst, t) {
       tone(ctx, dst, 200, 0.05, 0.18, 'sine', t, 140);
     },
@@ -120,14 +120,14 @@
       noise(ctx, dst, 0.05, 0.12, t, { type: 'bandpass', freq: 1400, q: 2 });
     },
 
-    // Enemy killed — zap + noise burst
+    // Enemy killed : zap + noise burst
     enemyDie(ctx, dst, t) {
       tone(ctx, dst, 700, 0.18, 0.3, 'square', t, 120);
       tone(ctx, dst, 350, 0.2, 0.2, 'sawtooth', t, 80);
       noise(ctx, dst, 0.2, 0.2, t, { type: 'bandpass', freq: 1000, q: 1 });
     },
 
-    // Power-up collected — bright arpeggio
+    // Power-up collected : bright arpeggio
     powerup(ctx, dst, t) {
       tone(ctx, dst, 523, 0.08, 0.25, 'triangle', t);
       tone(ctx, dst, 784, 0.08, 0.25, 'triangle', t + 0.06);
@@ -139,7 +139,7 @@
       tone(ctx, dst, 1400, 0.08, 0.18, 'sawtooth', t, 400);
     },
 
-    // Explosion — big noise burst + low boom
+    // Explosion : big noise burst + low boom
     explode(ctx, dst, t) {
       tone(ctx, dst, 120, 0.35, 0.45, 'sine', t, 35);
       noise(ctx, dst, 0.35, 0.4, t, { type: 'lowpass', freq: 1800, q: 0.8 });

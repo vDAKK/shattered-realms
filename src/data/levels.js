@@ -1,10 +1,10 @@
 // Level layouts: 14 cols x 10 rows
 // 0=empty, 1-3=normal(1HP), 4-5=hard(2HP), 6-7=ultra(3HP), 8=indestructible, 9=powerup brick
-// secrets: [{col,row}] — hidden bricks; destroy them all (one per realm) to unlock Realm 7
+// secrets: [{col,row}] : hidden bricks; destroy them all (one per realm) to unlock Realm 7
 
 const LEVELS = [
   // ════════════════════════════════════════════
-  // MONDE 1 — CAVERNES DE CRISTAL
+  // MONDE 1 : CAVERNES DE CRISTAL
   // ════════════════════════════════════════════
 
   // L1 · Pyramide de diamant
@@ -63,7 +63,7 @@ const LEVELS = [
     secrets: [{ col: 0, row: 0 }]
   },
 
-  // L4 · BOSS — Gardien Cristallin
+  // L4 · BOSS : Gardien Cristallin
   {
     world: 1, level: 4, isBoss: true,
     grid: [
@@ -83,7 +83,7 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 2 — FORGE INFERNALE
+  // MONDE 2 : FORGE INFERNALE
   // ════════════════════════════════════════════
 
   // L1 · Vague de lave
@@ -152,7 +152,7 @@ const LEVELS = [
     secrets: [{ col: 13, row: 0 }]
   },
 
-  // L4 · BOSS — Tyran Forgé
+  // L4 · BOSS : Tyran Forgé
   {
     world: 2, level: 4, isBoss: true,
     grid: [
@@ -172,7 +172,7 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 3 — DÉSOLATION DU VIDE
+  // MONDE 3 : DÉSOLATION DU VIDE
   // ════════════════════════════════════════════
 
   // L1 · Îles du Vide
@@ -243,7 +243,7 @@ const LEVELS = [
     ]
   },
 
-  // L4 · BOSS — Rôdeur du Vide
+  // L4 · BOSS : Rôdeur du Vide
   {
     world: 3, level: 4, isBoss: true,
     grid: [
@@ -263,11 +263,11 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 4 — JARDINS DE L'OUBLI (NOUVEAU)
+  // MONDE 4 : JARDINS DE L'OUBLI (NOUVEAU)
   // Thème : organique fossilisé, ambre, racines
   // ════════════════════════════════════════════
 
-  // L1 · Racines de Verre — branches qui descendent
+  // L1 · Racines de Verre : branches qui descendent
   {
     world: 4, level: 1, isBoss: false,
     grid: [
@@ -287,7 +287,7 @@ const LEVELS = [
     ]
   },
 
-  // L2 · Pollen de Néant — symétrie aérée, beaucoup d'ennemis qui tirent
+  // L2 · Pollen de Néant : symétrie aérée, beaucoup d'ennemis qui tirent
   {
     world: 4, level: 2, isBoss: false,
     grid: [
@@ -311,7 +311,7 @@ const LEVELS = [
     secrets: [{ col: 0, row: 4 }]
   },
 
-  // L3 · Serre Pétrifiée — ruche dense
+  // L3 · Serre Pétrifiée : ruche dense
   {
     world: 4, level: 3, isBoss: false,
     grid: [
@@ -333,7 +333,7 @@ const LEVELS = [
     ]
   },
 
-  // L4 · BOSS — La Reine Pétrifiée
+  // L4 · BOSS : La Reine Pétrifiée
   {
     world: 4, level: 4, isBoss: true,
     grid: [
@@ -353,7 +353,7 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 5 — CITADELLE DE NÉON
+  // MONDE 5 : CITADELLE DE NÉON
   // ════════════════════════════════════════════
 
   // L1 · Circuit Imprimé
@@ -426,7 +426,7 @@ const LEVELS = [
     ]
   },
 
-  // L4 · BOSS — L'Esprit-Circuit
+  // L4 · BOSS : L'Esprit-Circuit
   {
     world: 5, level: 4, isBoss: true,
     grid: [
@@ -446,7 +446,7 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 6 — CŒUR DU VIDE (Boss final canonique)
+  // MONDE 6 : CŒUR DU VIDE (Boss final canonique)
   // ════════════════════════════════════════════
   {
     world: 6, level: 1, isBoss: true,
@@ -467,11 +467,11 @@ const LEVELS = [
   },
 
   // ════════════════════════════════════════════
-  // MONDE 7 — ARCHIVES DE L'OUBLI (SECRET)
+  // MONDE 7 : ARCHIVES DE L'OUBLI (SECRET)
   // Débloqué uniquement après les 5 fragments secrets
   // ════════════════════════════════════════════
 
-  // L1 · Page Blanche — minimaliste, vide encadré
+  // L1 · Page Blanche : minimaliste, vide encadré
   {
     world: 7, level: 1, isBoss: false,
     grid: [
@@ -489,7 +489,7 @@ const LEVELS = [
     enemies: [{ type: 'shooter', col: 6, row: 0 }]
   },
 
-  // L2 · Marges Vivantes — colonnes étroites
+  // L2 · Marges Vivantes : colonnes étroites
   {
     world: 7, level: 2, isBoss: false,
     grid: [
@@ -510,7 +510,7 @@ const LEVELS = [
     ]
   },
 
-  // L3 · Paragraphe Final — cascade asymétrique
+  // L3 · Paragraphe Final : cascade asymétrique
   {
     world: 7, level: 3, isBoss: false,
     grid: [
@@ -532,7 +532,7 @@ const LEVELS = [
     ]
   },
 
-  // L4 · BOSS — L'Idée Primordiale
+  // L4 · BOSS : L'Idée Primordiale
   {
     world: 7, level: 4, isBoss: true,
     grid: [

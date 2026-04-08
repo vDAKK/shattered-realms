@@ -1,7 +1,7 @@
 const NARRATIVE = {
   opening: [
     "Jadis, l'Architecte figea l'absolu.",
-    "Réalité, temps, mémoire — tout fut enfermé sous le verre.",
+    "Réalité, temps, mémoire : tout fut enfermé sous le verre.",
     "Tu es KAEL. Un éclat de conscience. Un fragment qui hurle.",
     "Brise les couches. Atteins le Cœur. Exécute l'Architecte.",
     "Le monde attend son premier souffle."
@@ -23,7 +23,7 @@ const NARRATIVE = {
         { name: "GARDIEN DES CRISTAUX",   intro: "Il s'éveille. Le premier verrou. Le premier vrai test.", isBoss: true }
       ],
       bossName: "LE GARDIEN CRISTALLIN",
-      bossLore: "Sentinelle archaïque de la première strate. Son corps est un agrégat de vide compressé. Il ne protège rien — il empêche simplement le réveil.",
+      bossLore: "Sentinelle archaïque de la première strate. Son corps est un agrégat de vide compressé. Il ne protège rien : il empêche simplement le réveil.",
       bossDefeated: [
         "Le silence s'abat avec le verre.",
         "La première membrane du monde vient de céder.",
@@ -45,7 +45,7 @@ const NARRATIVE = {
         { name: "TYRAN DE LA FORGE",  intro: "Il forge la destruction dans ses entrailles. Le deuxième verrou.", isBoss: true }
       ],
       bossName: "LE TYRAN FORGÉ",
-      bossLore: "Forgé dans le métal-vide et la colère pure. Il n'a jamais connu l'échec — il redéfinit la victoire par la destruction de l'adversaire.",
+      bossLore: "Forgé dans le métal-vide et la colère pure. Il n'a jamais connu l'échec : il redéfinit la victoire par la destruction de l'adversaire.",
       bossDefeated: [
         "Le métal hurle et s'effondre.",
         "Le rugissement de la forge s'éteint.",
@@ -153,7 +153,7 @@ const NARRATIVE = {
         { name: "L'IDÉE PRIMORDIALE",  intro: "L'ombre de ce que le monde aurait dû être.", isBoss: true }
       ],
       bossName: "L'IDÉE PRIMORDIALE",
-      bossLore: "Le premier concept de l'existence. Une forme géométrique pure qui pleure des pixels de lumière. Elle ne te combat pas — elle te démontre.",
+      bossLore: "Le premier concept de l'existence. Une forme géométrique pure qui pleure des pixels de lumière. Elle ne te combat pas : elle te démontre.",
       bossDefeated: [
         "Le concept se dissout.",
         "Il n'y a plus de murs.",

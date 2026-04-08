@@ -35,8 +35,8 @@ class UpgradeScene extends Phaser.Scene {
 
     // ── World / Level info ───────────────────────────────
     const nextLevelLabel = gs.level <= 4
-      ? `MONDE ${gs.world} — Niveau ${gs.level}`
-      : `MONDE ${gs.world + 1} — À venir`;
+      ? `MONDE ${gs.world} : Niveau ${gs.level}`
+      : `MONDE ${gs.world + 1} : À venir`;
 
     this.add.text(W / 2, H * 0.15, nextLevelLabel, {
       fontFamily: 'Share Tech Mono, Courier New',

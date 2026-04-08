@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-//  SHATTERED REALMS — Service Worker
+//  SHATTERED REALMS : Service Worker
 //  Stratégie : Cache-first pour les assets locaux,
 //              Network-first pour Phaser CDN
 // ═══════════════════════════════════════════════════════

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-//  SHATTERED REALMS — Entry Point (Portrait Mode)
+//  SHATTERED REALMS : Entry Point (Portrait Mode)
 // ═══════════════════════════════════════════════════════
 
 window.GameState = {

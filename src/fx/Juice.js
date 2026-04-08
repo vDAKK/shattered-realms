@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-//  JUICE — Post-processing + game-feel helpers
+//  JUICE : Post-processing + game-feel helpers
 //  Provides: bloom, vignette, scanlines, hit-stop, RGB split flash
 // ═══════════════════════════════════════════════════════
 
@@ -28,7 +28,7 @@ window.Juice = {
         cam.postFX.addVignette(0.5, 0.5, 1.3, vignetteStrength);
       }
     } catch (e) {
-      // Canvas renderer fallback — silently skip
+      // Canvas renderer fallback : silently skip
     }
 
     if (scanlines) this._addScanlines(scene);

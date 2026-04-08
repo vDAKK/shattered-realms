@@ -50,7 +50,7 @@ class BootScene extends Phaser.Scene {
     g.generateTexture('star', 4, 4);
     g.destroy();
 
-    // ── Brick textures (types 1-9) — portrait size 30×14 ─
+    // ── Brick textures (types 1-9) : portrait size 30×14 ─
     const BRICK_W = 30, BRICK_H = 14;
     const brickConfigs = [
       null,

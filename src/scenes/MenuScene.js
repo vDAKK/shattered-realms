@@ -35,7 +35,7 @@ class MenuScene extends Phaser.Scene {
       color: '#00e5ff', letterSpacing: 10,
     }).setOrigin(0.5);
 
-    this.add.text(W / 2, titleY + 82, '— Un roguelite brick-breaker —', {
+    this.add.text(W / 2, titleY + 82, ': Un roguelite brick-breaker :', {
       fontFamily: 'Share Tech Mono, Courier New',
       fontSize: '11px', color: '#88bbcc', letterSpacing: 1,
     }).setOrigin(0.5);

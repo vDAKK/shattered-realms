@@ -1,4 +1,4 @@
-# SHATTERED REALMS — Narrative Brief
+# SHATTERED REALMS : Narrative Brief
 
 > A briefing document for expanding the narrative and level content of *Shattered Realms*, a portrait-mode roguelite brick-breaker built in HTML5/Phaser 3.
 
@@ -20,7 +20,7 @@ Played once at the start of a new game (in French):
 
 > Il y a longtemps, le Void Architect cristallisa le monde.
 >
-> Réalité, temps, mémoire — tout figé dans des couches de verre brisé.
+> Réalité, temps, mémoire : tout figé dans des couches de verre brisé.
 >
 > Tu es KAEL. Un fragment conscient. Un éclat qui refuse de se taire.
 >
@@ -32,7 +32,7 @@ Played once at the start of a new game (in French):
 
 ## 3. The Realms (current state)
 
-### Realm 1 — CAVERNES DE CRISTAL (*The Awakening*)
+### Realm 1 : CAVERNES DE CRISTAL (*The Awakening*)
 - **Color**: cyan `#00e5ff`
 - **Description**: "Les premières formations. Fragiles. Presque belles."
 - **Mood**: cold, fragile, dawn-of-awareness, no enemies yet.
@@ -51,7 +51,7 @@ Played once at the start of a new game (in French):
   > La première couche tombe.
   > Le chemin s'ouvre vers la forge...
 
-### Realm 2 — FORGE INFERNALE (*The Resistance*)
+### Realm 2 : FORGE INFERNALE (*The Resistance*)
 - **Color**: orange-red `#ff4400`
 - **Description**: "La chaleur de la forge remplace le froid des cristaux."
 - **Mood**: heat, industry, first armed sentinels.
@@ -64,13 +64,13 @@ Played once at the start of a new game (in French):
 | 4 | **TYRAN DE LA FORGE** *(boss)* | "Il forge la destruction dans ses entrailles. Le deuxième verrou." |
 
 - **Boss**: **LE TYRAN FORGÉ**
-- **Boss lore**: "Born from molten void-metal and anger. It has never known defeat — until now."
+- **Boss lore**: "Born from molten void-metal and anger. It has never known defeat : until now."
 - **Boss defeat lines**:
   > La forge s'éteint dans un ultime rugissement.
   > Les flammes laissent place au vide.
   > Le Néant s'étend au-delà...
 
-### Realm 3 — DÉSOLATION DU VIDE (*The Descent*)
+### Realm 3 : DÉSOLATION DU VIDE (*The Descent*)
 - **Color**: violet `#aa00ff`
 - **Description**: "Ici, les règles physiques se plient. Rien n'est fixe."
 - **Mood**: surreal, anti-logic, primordial dread.
@@ -89,7 +89,7 @@ Played once at the start of a new game (in French):
   > La mémoire de quelque chose d'ancien disparaît.
   > La Cité de Néon brille devant toi...
 
-### Realm 4 — CITADELLE DE NÉON (*The Truth*)
+### Realm 4 : CITADELLE DE NÉON (*The Truth*)
 - **Color**: green `#00ff88`
 - **Description**: "La dernière couche avant le cœur. Technologie et magie fusionnées."
 - **Mood**: techno-magic, surveillance, predictive AI defenses.
@@ -108,7 +108,7 @@ Played once at the start of a new game (in French):
   > "Calcul... impossible."
   > Le chemin vers l'Architecte s'ouvre enfin...
 
-### Realm 5 — CŒUR DU VIDE (*Final Confrontation*)
+### Realm 5 : CŒUR DU VIDE (*Final Confrontation*)
 A single boss room. No standard levels.
 
 - **Boss**: **LE VOID ARCHITECT**
@@ -171,9 +171,9 @@ Bricks fill from the top of the play field. Rows 8–9 are typically left empty 
 
 ### Enemies (used from Realm 2 onward)
 Defined per-level via `enemies: [{ type, col, row }]`. Three current types:
-- `drifter` — slow horizontal mover, no projectiles
-- `shooter` — stationary, fires bullets at the paddle
-- `guardian` — tougher drifter, blocks the ball
+- `drifter` : slow horizontal mover, no projectiles
+- `shooter` : stationary, fires bullets at the paddle
+- `guardian` : tougher drifter, blocks the ball
 - (an additional `invader` type exists for waves but isn't placed manually)
 
 ### Bosses
@@ -197,9 +197,9 @@ I'd like you to **expand and elevate the narrative** of *Shattered Realms*. Spec
 ### A. Polish the existing narration
 - Tighten the prose. Keep the terse, mythic tone.
 - Strengthen the **opening crawl** without making it longer than ~6 lines.
-- Improve **boss lore** (currently mixed French/English — please make all of it French and more evocative).
+- Improve **boss lore** (currently mixed French/English : please make all of it French and more evocative).
 - Punch up the **boss defeat sequences** so they feel like consequences, not just transitions.
-- Improve the **Void Architect** confrontation — make the monologue more memorable, the phase taunts more menacing, and the defeat ending genuinely cathartic.
+- Improve the **Void Architect** confrontation : make the monologue more memorable, the phase taunts more menacing, and the defeat ending genuinely cathartic.
 
 ### B. Add at least one new Realm
 Propose a **new Realm 5** (or insert as Realm 4.5 / new Realm) with:
@@ -209,13 +209,13 @@ Propose a **new Realm 5** (or insert as Realm 4.5 / new Realm) with:
 - A boss display name, French lore paragraph, and 3-line defeat sequence
 - A **distinct theme** that doesn't overlap with crystal / forge / void / neon
 
-(If you want to add more than one new Realm, even better — propose 2.)
+(If you want to add more than one new Realm, even better : propose 2.)
 
 ### C. Propose new level layouts
 For **every new level you add**, provide the 14×10 grid as a code-block matrix (see existing examples above for the format) AND a list of `enemies` if any. Use the existing brick value table. Try to make layouts that *feel* like the level name (e.g. a level called "Spirale" should have a spiral, "Forteresse" should have walls + interior).
 
 ### D. Add 1–2 new mid-game flavor moments
-Short narrative interludes that could play between Realms — not full cutscenes, just 2-4 lines of atmospheric text. These would help the world feel bigger.
+Short narrative interludes that could play between Realms : not full cutscenes, just 2-4 lines of atmospheric text. These would help the world feel bigger.
 
 ### E. Bonus: more game-over flavor
 Add 3–5 more `(title, message)` pairs in the same tone as the existing ones.
@@ -242,4 +242,4 @@ Please structure your response as a series of **clearly labeled sections** match
 
 Keep prose in **French** to match the existing game. Lore paragraphs and item descriptions should also be French.
 
-Don't worry about coding — I'll integrate everything you write into the actual files myself.
+Don't worry about coding : I'll integrate everything you write into the actual files myself.

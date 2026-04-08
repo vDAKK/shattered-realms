@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-//  MUSIC — Procedural WebAudio synth (chiptune / synthwave)
+//  MUSIC : Procedural WebAudio synth (chiptune / synthwave)
 //  Exposes window.GameMusic with play(trackName) / stop() / setVolume()
 // ═══════════════════════════════════════════════════════
 
@@ -22,7 +22,7 @@
   // Tracks: each returns notes per step (16-step bars)
   const TRACKS = {
     menu: {
-      // Atmospheric synthwave menu theme — i / VI / III / VII (minor)
+      // Atmospheric synthwave menu theme : i / VI / III / VII (minor)
       bpm: 84,
       root: -9,           // C minor
       scale: 'minor',

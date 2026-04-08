@@ -1,7 +1,7 @@
 {
   "name": "Shattered Realms",
   "short_name": "Shattered",
-  "description": "Un roguelite brick-breaker narratif — brisez les couches cristallisées du monde",
+  "description": "Un roguelite brick-breaker narratif : brisez les couches cristallisées du monde",
   "start_url": "./index.html",
   "scope": "./",
   "display": "fullscreen",
