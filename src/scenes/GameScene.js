@@ -18,7 +18,7 @@ class GameScene extends Phaser.Scene {
     this.levelData = getLevelData(gs.world, gs.level);
 
     // Post-FX + music
-    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.5, vignetteStrength: 0.08 });
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.18, vignetteStrength: 0.04 });
     if (window.GameMusic) {
       const isBoss = this.levelData && this.levelData.isBoss;
       let track = 'game';
@@ -671,10 +671,10 @@ class GameScene extends Phaser.Scene {
       hp: eData.type === 'guardian' ? 2 + Math.floor(world / 2) : (eData.type === 'invader' ? 1 : 1),
       dir: 1,
       speed: (eData.type === 'drifter' || eData.type === 'invader' ? 70 : (eData.type === 'guardian' ? 55 : 0)) + world * 10,
-      fireRate: eData.type === 'shooter' ? Math.max(600, 2400 * diffMult)
-        : eData.type === 'guardian' ? Math.max(800, 2800 * diffMult)
-        : eData.type === 'invader' ? Math.max(1200, 3000 * diffMult) : 99999,
-      fireTimer: 600 + Math.random() * 1200,
+      fireRate: eData.type === 'shooter' ? Math.max(400, 1600 * diffMult)
+        : eData.type === 'guardian' ? Math.max(500, 1800 * diffMult)
+        : eData.type === 'invader' ? Math.max(800, 2000 * diffMult) : 99999,
+      fireTimer: 400 + Math.random() * 800,
       alive: true,
       isInvader: eData.type === 'invader',
       descendSpeed: eData.type === 'invader' ? 8 + world * 2 : 0,
@@ -880,7 +880,9 @@ class GameScene extends Phaser.Scene {
     const relX = Phaser.Math.Clamp((ball.sprite.x - p.x) / hw, -0.95, 0.95);
     const maxAngle = 70 * (Math.PI / 180);
     const bounceAngle = relX * maxAngle;
-    const spd = Math.max(Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy), gs.ballSpeed);
+    // Each paddle hit adds a tiny speed bump (capped at 2× base) — keeps rallies tense
+    let spd = Math.max(Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy), gs.ballSpeed);
+    spd = Math.min(spd * 1.03, gs.ballSpeed * 2);
     ball.vx = spd * Math.sin(bounceAngle);
     ball.vy = -spd * Math.cos(bounceAngle);
     ball.sprite.y = p.y - BALL_SIZE / 2 - 7 - 1;
@@ -1347,7 +1349,7 @@ class GameScene extends Phaser.Scene {
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (boss._burstOffset || 0);
       const sprite = this.add.image(boss.sprite.x, boss.sprite.y, 'enemy_bullet')
-        .setScale(1.6).setTint(tint);
+        .setScale(2.2).setTint(tint);
       this.enemyBullets.push({
         sprite,
         vx: Math.cos(angle) * speed,
@@ -1702,9 +1704,10 @@ class GameScene extends Phaser.Scene {
     const jitter = (Math.random() - 0.5) * 0.25;
     const angle = Math.atan2(dy, dx) + jitter;
 
+    const tint = this._worldBulletTint();
     const sprite = this.add.image(enemy.sprite.x, enemy.sprite.y + 16, 'enemy_bullet')
-      .setScale(1.2)
-      .setTint(this._worldBulletTint());
+      .setScale(2.0)
+      .setTint(tint);
 
     this.enemyBullets.push({
       sprite,
@@ -1812,7 +1815,8 @@ class GameScene extends Phaser.Scene {
   }
 
   _worldBulletTint() {
-    return [0x00ccff, 0xff6600, 0xcc00ff, 0xffaa33, 0x00ff88, 0xffffff, 0xe0e0e0][(window.GameState.world - 1)] || 0xff4400;
+    // Bright saturated colors — always visible on dark bg
+    return [0xff2255, 0xff6600, 0xff00ff, 0x00ffaa, 0xffee00, 0xff4488, 0xcc88ff][(window.GameState.world - 1)] || 0xff2255;
   }
 
   _fireLaser() {

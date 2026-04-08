@@ -5,7 +5,7 @@ class MenuScene extends Phaser.Scene {
     const W = this.scale.width, H = this.scale.height;
 
     // ── FX + Music ────────────────────────────────────────
-    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.5, vignetteStrength: 0.1 });
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.25, vignetteStrength: 0.06 });
     if (window.GameMusic) window.GameMusic.play('menu');
 
     // ── Background ────────────────────────────────────────

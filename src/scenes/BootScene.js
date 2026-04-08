@@ -229,11 +229,13 @@ class BootScene extends Phaser.Scene {
 
     // ── Enemy bullet ─────────────────────────────────────
     g = this.make.graphics({ add: false });
-    g.fillStyle(0xff4400, 1);
-    g.fillCircle(4, 4, 4);
-    g.fillStyle(0xff8800, 0.7);
-    g.fillCircle(4, 4, 2);
-    g.generateTexture('enemy_bullet', 8, 8);
+    g.fillStyle(0xffffff, 0.35);
+    g.fillCircle(7, 7, 7);       // soft outer glow
+    g.fillStyle(0xffffff, 1);
+    g.fillCircle(7, 7, 4);       // bright core
+    g.fillStyle(0xffffff, 0.9);
+    g.fillCircle(7, 7, 2);       // inner highlight
+    g.generateTexture('enemy_bullet', 14, 14);
     g.destroy();
 
     // ── Player laser ─────────────────────────────────────

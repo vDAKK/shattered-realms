@@ -5,7 +5,7 @@ class GameOverScene extends Phaser.Scene {
     const W = this.scale.width, H = this.scale.height;
     const gs = window.GameState;
 
-    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.45, vignetteStrength: 0.15 });
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.25, vignetteStrength: 0.08 });
     if (window.GameMusic) window.GameMusic.play('gameover');
     if (window.SFX) window.SFX.play('gameOver');
 

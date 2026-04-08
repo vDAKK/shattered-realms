@@ -5,7 +5,7 @@ class VictoryScene extends Phaser.Scene {
     const W = this.scale.width, H = this.scale.height;
     const gs = window.GameState;
 
-    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.55, vignetteStrength: 0.1 });
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.25, vignetteStrength: 0.06 });
     if (window.GameMusic) window.GameMusic.play('victory');
     if (window.SFX) window.SFX.play('victory');
 

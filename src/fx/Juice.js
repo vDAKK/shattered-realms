@@ -44,7 +44,7 @@ window.Juice = {
     c.width = 2; c.height = 3;
     const ctx = c.getContext('2d');
     ctx.clearRect(0, 0, 2, 3);
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.10)';
     ctx.fillRect(0, 0, 2, 1);
     scene.textures.addCanvas(this._scanTexKey, c);
   },
@@ -71,7 +71,7 @@ window.Juice = {
       .setOrigin(0, 0)
       .setScrollFactor(0)
       .setDepth(99998);
-    ts.alpha = 0.15;
+    ts.alpha = 0.07;
     scene.events.once('shutdown', () => ts.destroy());
     scene.events.once('destroy', () => ts.destroy());
     return ts;
