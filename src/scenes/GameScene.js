@@ -1349,7 +1349,7 @@ class GameScene extends Phaser.Scene {
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2 + (boss._burstOffset || 0);
       const sprite = this.add.image(boss.sprite.x, boss.sprite.y, 'enemy_bullet')
-        .setScale(2.2).setTint(tint);
+        .setScale(1.6).setTint(tint);
       this.enemyBullets.push({
         sprite,
         vx: Math.cos(angle) * speed,
@@ -1366,7 +1366,7 @@ class GameScene extends Phaser.Scene {
     if (this.puExpandTimer > 0) {
       this.puExpandTimer -= scaledDelta;
       if (this.puExpandTimer <= 0) {
-        window.GameState.paddleWidth = Math.max(120, window.GameState.paddleWidth - 30);
+        window.GameState.paddleWidth = Math.max(90, window.GameState.paddleWidth - 25);
         this.paddle.setDisplaySize(window.GameState.paddleWidth, 14);
       }
     }
@@ -1706,7 +1706,7 @@ class GameScene extends Phaser.Scene {
 
     const tint = this._worldBulletTint();
     const sprite = this.add.image(enemy.sprite.x, enemy.sprite.y + 16, 'enemy_bullet')
-      .setScale(2.0)
+      .setScale(1.3)
       .setTint(tint);
 
     this.enemyBullets.push({
@@ -1991,7 +1991,7 @@ class GameScene extends Phaser.Scene {
         this._showFloatingText(pu.sprite.x, pu.sprite.y, 'MULTI BALLE!', '#ff88ff');
         break;
       case 'pu_expand':
-        gs.paddleWidth = Math.min(gs.paddleWidth + 30, 220);
+        gs.paddleWidth = Math.min(gs.paddleWidth + 25, 170);
         this.puExpandTimer = 15000 * durMult;
         this._showFloatingText(pu.sprite.x, pu.sprite.y, 'ÉTENDUE!', '#00e5ff');
         break;

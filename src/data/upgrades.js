@@ -6,7 +6,7 @@ const UPGRADES = [
     icon: 'upgrade_wide',
     rarity: 'common',
     color: 0x00e5ff,
-    apply: (state) => { state.paddleWidth = Math.min(state.paddleWidth + 25, 220); }
+    apply: (state) => { state.paddleWidth = Math.min(state.paddleWidth + 20, 170); }
   },
   {
     id: 'swift_ball',
