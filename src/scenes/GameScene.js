@@ -941,7 +941,7 @@ class GameScene extends Phaser.Scene {
 
       // Camera flash matching brick color
       const r = (color >> 16) & 0xff, g = (color >> 8) & 0xff, b = color & 0xff;
-      this.cameras.main.flash(80, r, g, b, false, null, true);
+      // flash supprimé (désagréable à chaque impact)
 
       // Chain reaction
       if (gs.chainChance && Math.random() < gs.chainChance) {
