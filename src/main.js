@@ -6,7 +6,7 @@ window.GameState = {
   world: 1, level: 1,
   score: 0, hp: 3, maxHp: 3,
   voidShards: 0, upgrades: [],
-  ballSpeed: 640, paddleWidth: 80, startBalls: 1,
+  ballSpeed: 740, paddleWidth: 40, startBalls: 1,
   hasLaser: false, netBounces: 0,
   voidShieldCharges: 0, timeDilationCharges: 0,
   fireCoreDuration: 0, ghostDuration: 0,
