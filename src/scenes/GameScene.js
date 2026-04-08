@@ -679,10 +679,10 @@ class GameScene extends Phaser.Scene {
       hp: eData.type === 'guardian' ? 2 + Math.floor(world / 2) : (eData.type === 'invader' ? 1 : 1),
       dir: 1,
       speed: (eData.type === 'drifter' || eData.type === 'invader' ? 70 : (eData.type === 'guardian' ? 55 : 0)) + world * 10,
-      fireRate: eData.type === 'shooter' ? Math.max(400, 1600 * diffMult)
-        : eData.type === 'guardian' ? Math.max(500, 1800 * diffMult)
-        : eData.type === 'invader' ? Math.max(800, 2000 * diffMult) : 99999,
-      fireTimer: 400 + Math.random() * 800,
+      fireRate: eData.type === 'shooter' ? Math.max(1200, 3200 * diffMult)
+        : eData.type === 'guardian' ? Math.max(1500, 3800 * diffMult)
+        : eData.type === 'invader' ? Math.max(2000, 4500 * diffMult) : 99999,
+      fireTimer: 1200 + Math.random() * 2000,
       alive: true,
       isInvader: eData.type === 'invader',
       descendSpeed: eData.type === 'invader' ? 8 + world * 2 : 0,
