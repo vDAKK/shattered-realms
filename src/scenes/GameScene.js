@@ -17,6 +17,16 @@ class GameScene extends Phaser.Scene {
     const gs = window.GameState;
     this.levelData = getLevelData(gs.world, gs.level);
 
+    // Post-FX + music
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.5, vignetteStrength: 0.08 });
+    if (window.GameMusic) {
+      const isBoss = this.levelData && this.levelData.isBoss;
+      let track = 'game';
+      if (isBoss) track = 'boss';
+      else if (gs.world === 1 && gs.level === 1) track = 'intro';
+      window.GameMusic.play(track);
+    }
+
     // State flags
     this.ballLaunched = false;
     this.gamePaused = false;
@@ -113,6 +123,7 @@ class GameScene extends Phaser.Scene {
 
     // ── Input ────────────────────────────────────────────
     this.input.on('pointermove', (ptr) => {
+      if (this.levelingUp || this.gamePaused) return;
       if (ptr.id === 0 || !this._mobileActionPointer || ptr.id !== this._mobileActionPointer) {
         this._movePaddle(ptr.x);
       }
@@ -218,6 +229,8 @@ class GameScene extends Phaser.Scene {
       const pu = this.powerUps[i];
       pu.sprite.y += 100 * (scaledDelta / 1000);
       pu.sprite.rotation += 1.5 * (scaledDelta / 1000);
+      pu.label.x = pu.sprite.x;
+      pu.label.y = pu.sprite.y + 22;
       if (pu.sprite.y > GH + 30) {
         pu.sprite.destroy();
         pu.label.destroy();
@@ -302,7 +315,7 @@ class GameScene extends Phaser.Scene {
     const isTouch = this.sys.game.device.input.touch;
     if (!isTouch || !this._btnLaser) return;
 
-    const hasLaser = gs.hasLaser || this.puLaserTimer > 0 || this.puMinigunTimer > 0;
+    const hasLaser = gs.hasLaser || this.puMinigunTimer > 0;
     this._btnLaser.bg.setAlpha(hasLaser ? 1 : 0.3);
     this._btnLaser.txt.setAlpha(hasLaser ? 1 : 0.3);
 
@@ -407,14 +420,14 @@ class GameScene extends Phaser.Scene {
     // World name (top-left)
     this.hudWorldText = this.add.text(8, 8, worldData ? worldData.name : 'MONDE 1', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '10px', color: worldColorStr, fontStyle: 'bold', letterSpacing: 1
+      fontSize: '13px', color: worldColorStr, fontStyle: 'bold', letterSpacing: 1
     }).setDepth(11);
 
     // Level indicator
     const levelData = this.levelData;
     this.hudLevelText = this.add.text(8, 24, levelData.isBoss ? '⚡ BOSS' : `Niv ${gs.level}/4`, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '9px', color: '#446677'
+      fontSize: '13px', color: '#aaccee', fontStyle: 'bold'
     }).setDepth(11);
 
     // Score (center)
@@ -425,7 +438,7 @@ class GameScene extends Phaser.Scene {
 
     this.add.text(GW / 2, 34, 'SCORE', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '8px', color: '#334455', letterSpacing: 2
+      fontSize: '11px', color: '#99aabb', letterSpacing: 2
     }).setOrigin(0.5).setDepth(11);
 
     // HP display (top-right)
@@ -435,7 +448,7 @@ class GameScene extends Phaser.Scene {
     // Combo text (below score)
     this.comboText = this.add.text(GW / 2, 42, '', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '10px', color: '#ffcc00', fontStyle: 'bold'
+      fontSize: '13px', color: '#ffcc00', fontStyle: 'bold'
     }).setOrigin(0.5).setDepth(11).setAlpha(0);
 
     // ── XP Bar ──────────────────────────────────────────
@@ -445,7 +458,7 @@ class GameScene extends Phaser.Scene {
     this.xpBarBorder = this.add.rectangle(GW / 2, xpBarY, GW - 16, 8, 0x000000, 0).setStrokeStyle(1, 0x00e5ff, 0.4).setDepth(10);
     this.xpLevelText = this.add.text(GW / 2, xpBarY, `LV ${gs.xpLevel}`, {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '7px', color: '#ffffff', fontStyle: 'bold'
+      fontSize: '10px', color: '#ffffff', fontStyle: 'bold'
     }).setOrigin(0.5).setDepth(11);
 
     // Active upgrades strip
@@ -455,7 +468,7 @@ class GameScene extends Phaser.Scene {
     // Power-up status bar
     this.puStatusText = this.add.text(GW - 8, 66, '', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '8px', color: '#00e5ff', align: 'right'
+      fontSize: '11px', color: '#00e5ff', align: 'right'
     }).setOrigin(1, 0).setDepth(11);
 
     // Boss health bar
@@ -464,7 +477,7 @@ class GameScene extends Phaser.Scene {
     // Time dilation indicator
     this.tdIndicator = this.add.text(GW / 2, 80, '', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '9px', color: '#8888ff', letterSpacing: 3
+      fontSize: '12px', color: '#a0a0ff', letterSpacing: 3
     }).setOrigin(0.5).setAlpha(0).setDepth(11);
   }
 
@@ -501,7 +514,9 @@ class GameScene extends Phaser.Scene {
       bg:     this.add.rectangle(GW / 2, 78, 300, 8, 0x220000, 1).setVisible(false).setDepth(10),
       fill:   this.add.rectangle(GW / 2 - 150, 78, 300, 8, 0xff0044, 1).setVisible(false).setOrigin(0, 0.5).setDepth(10),
       label:  this.add.text(GW / 2, 88, '', {
-        fontFamily: 'Orbitron, Courier New', fontSize: '8px', color: '#ff4466', letterSpacing: 2
+        fontFamily: 'Orbitron, Courier New', fontSize: '14px', color: '#ff6688',
+        fontStyle: 'bold', letterSpacing: 2,
+        stroke: '#000000', strokeThickness: 3,
       }).setOrigin(0.5, 0).setVisible(false).setDepth(11),
       border: this.add.rectangle(GW / 2, 78, 302, 10, 0x000000, 0).setVisible(false)
         .setStrokeStyle(1, 0xff0044, 0.6).setDepth(10),
@@ -593,7 +608,7 @@ class GameScene extends Phaser.Scene {
     const sprite = this.add.image(bx, by, 'ball');
     const glow   = this.add.image(bx, by, 'ball_glow').setAlpha(0.4).setDepth(-1);
 
-    const ball = { sprite, glow, vx: vx || 0, vy: vy || 0, launched, trail: [], trailMax: 5, piercesLeft: 0 };
+    const ball = { sprite, glow, vx: vx || 0, vy: vy || 0, launched, trail: [], trailMax: 10, piercesLeft: 0 };
     this.balls.push(ball);
 
     if (!launched && this.balls.length === 1) {
@@ -741,9 +756,9 @@ class GameScene extends Phaser.Scene {
       const steer = (this.paddle.x - ball.sprite.x) * 0.28;
       ball.vx += steer * dt;
       const spd = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
-      if (spd > gs.ballSpeed * 1.5) {
-        ball.vx = (ball.vx / spd) * gs.ballSpeed * 1.5;
-        ball.vy = (ball.vy / spd) * gs.ballSpeed * 1.5;
+      if (spd > gs.ballSpeed * 1.9) {
+        ball.vx = (ball.vx / spd) * gs.ballSpeed * 1.9;
+        ball.vy = (ball.vy / spd) * gs.ballSpeed * 1.9;
       }
     }
 
@@ -830,6 +845,8 @@ class GameScene extends Phaser.Scene {
     ball.sprite.y = p.y - BALL_SIZE / 2 - 7 - 1;
     ball.piercesLeft = gs.piercingCount || 0;
 
+    if (window.SFX) window.SFX.play('paddleHit');
+
     // Paddle flash
     this.tweens.add({ targets: this.paddle, alpha: { from: 0.6, to: 1 }, duration: 80 });
     // Paddle scale punch
@@ -894,7 +911,22 @@ class GameScene extends Phaser.Scene {
 
     const damage = this.puFire ? brick.hp : 1;
     brick.hp -= damage;
+    if (window.SFX) window.SFX.play(brick.hp <= 0 ? 'brickBreak' : 'brickHit', { minGap: 0.015 });
     this.bricksBrokenThisLevel++;
+
+    // Combo-driven ball acceleration — every brick destroyed makes the game more nervous
+    if (brick.hp <= 0) {
+      const targetMult = Math.min(1 + this.combo * 0.025, 1.7);
+      const targetSpeed = gs.ballSpeed * targetMult;
+      this.balls.forEach(b => {
+        const s = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+        if (s > 0 && s < targetSpeed) {
+          const k = (s + (targetSpeed - s) * 0.35) / s;
+          b.vx *= k;
+          b.vy *= k;
+        }
+      });
+    }
     this.explosiveCounter++;
     gs.bricksBroken = (gs.bricksBroken || 0) + 1;
 
@@ -908,8 +940,8 @@ class GameScene extends Phaser.Scene {
 
     if (brick.hp <= 0) {
       // XP gain
-      const xpGain = Math.floor((brick.maxHp * 8 + this.combo * 2) * (this.puDoubleTimer > 0 ? 2 : 1));
-      this._addXP(xpGain);
+      const xpGain = Math.floor((brick.maxHp * 4 + this.combo) * (this.puDoubleTimer > 0 ? 2 : 1));
+      this._addXP(xpGain, brick.sprite.x, brick.sprite.y);
 
       // Destroyed effects — JUICE
       const color = this._brickColor(brick.cell);
@@ -932,12 +964,12 @@ class GameScene extends Phaser.Scene {
         );
       }
 
-      // Hitstop — brief freeze for impact
-      if (this.combo >= 5) {
-        this.hitstopTimer = Math.min(25 + this.combo * 3, 60);
-      } else if (brick.maxHp >= 2) {
-        this.hitstopTimer = 20;
-      }
+      // Hitstop — only on combo milestones or tough bricks, never stacked
+      // (rapid-fire kills like minigun were chaining 60ms freezes back-to-back)
+      let stop = 0;
+      if (this.combo > 0 && this.combo % 10 === 0) stop = 35;
+      else if (brick.maxHp >= 3) stop = 18;
+      if (stop > this.hitstopTimer) this.hitstopTimer = stop;
 
       // Camera flash matching brick color
       const r = (color >> 16) & 0xff, g = (color >> 8) & 0xff, b = color & 0xff;
@@ -973,7 +1005,7 @@ class GameScene extends Phaser.Scene {
       brick.sprite.setTexture(`brick_${brick.cell}_cracked`);
       this._emitParticles(brick.sprite.x, brick.sprite.y, this._brickColor(brick.cell), 5);
       this.cameras.main.shake(50, 0.004);
-      this.hitstopTimer = 15;
+      // No hitstop on simple cracks — only on destruction. Avoids minigun freeze.
     }
   }
 
@@ -997,11 +1029,12 @@ class GameScene extends Phaser.Scene {
       if (b.indestructible) continue;
       const dx = b.sprite.x - sx, dy = b.sprite.y - sy;
       if (Math.sqrt(dx * dx + dy * dy) < (BRICK_W + BRICK_PAD_X) * 1.8) {
-        this._emitParticles(b.sprite.x, b.sprite.y, this._brickColor(b.cell), 10);
+        const bx = b.sprite.x, by = b.sprite.y;
+        this._emitParticles(bx, by, this._brickColor(b.cell), 10);
         b.sprite.destroy();
         this.bricks.splice(i, 1);
         window.GameState.score += b.maxHp * 5;
-        this._addXP(b.maxHp * 5);
+        this._addXP(b.maxHp * 2, bx, by);
       }
     }
     this.cameras.main.shake(100, 0.008);
@@ -1009,17 +1042,19 @@ class GameScene extends Phaser.Scene {
   }
 
   _explosiveArea(cx, cy) {
+    if (window.SFX) window.SFX.play('explode');
     const radius = BRICK_W * 2.5;
     for (let i = this.bricks.length - 1; i >= 0; i--) {
       const b = this.bricks[i];
       if (b.indestructible) continue;
       const dx = b.sprite.x - cx, dy = b.sprite.y - cy;
       if (Math.sqrt(dx * dx + dy * dy) < radius) {
-        this._emitParticles(b.sprite.x, b.sprite.y, 0xff8800, 12);
+        const bx = b.sprite.x, by = b.sprite.y;
+        this._emitParticles(bx, by, 0xff8800, 12);
         b.sprite.destroy();
         this.bricks.splice(i, 1);
         window.GameState.score += b.maxHp * 8;
-        this._addXP(b.maxHp * 6);
+        this._addXP(b.maxHp * 3, bx, by);
       }
     }
     this._emitParticles(cx, cy, 0xffcc00, 30);
@@ -1038,11 +1073,12 @@ class GameScene extends Phaser.Scene {
         enemy.hp--;
         ball.vy *= -1;
         this._emitParticles(enemy.sprite.x, enemy.sprite.y, 0xff4466, 10);
+        if (window.SFX) window.SFX.play(enemy.hp <= 0 ? 'enemyDie' : 'enemyHit');
         if (enemy.hp <= 0) {
           this._killEnemy(enemy, i);
           const pts = (enemy.isInvader ? 80 : 50) * window.GameState.world;
           window.GameState.score += pts;
-          this._addXP(enemy.isInvader ? 25 : 15);
+          this._addXP(enemy.isInvader ? 12 : 7, enemy.sprite.x, enemy.sprite.y);
           this._showFloatingScore(enemy.sprite.x, enemy.sprite.y, pts);
         } else {
           this.tweens.add({ targets: enemy.sprite, alpha: 0.3, duration: 60, yoyo: true });
@@ -1074,7 +1110,8 @@ class GameScene extends Phaser.Scene {
       const ratio = Math.max(0, boss.hp / boss.maxHp);
       this.bossHpBar.fill.setDisplaySize(300 * ratio, 8);
 
-      this._addXP(20);
+      this._addXP(10, boss.sprite.x, boss.sprite.y);
+      if (window.SFX) window.SFX.play('bossHit');
 
       if (boss.hp <= 0) {
         this._defeatBoss();
@@ -1123,7 +1160,7 @@ class GameScene extends Phaser.Scene {
         this._emitParticles(laser.sprite.x, laser.sprite.y, 0xff6600, 6);
         laser.sprite.destroy();
         this.playerLasers.splice(laserIndex, 1);
-        this._addXP(10);
+        this._addXP(5, boss.sprite.x, boss.sprite.y);
         if (boss.hp <= 0) this._defeatBoss();
       }
     }
@@ -1138,7 +1175,7 @@ class GameScene extends Phaser.Scene {
         if (enemy.hp <= 0) {
           this._killEnemy(enemy, i);
           window.GameState.score += 50 * window.GameState.world;
-          this._addXP(15);
+          this._addXP(7, enemy.sprite.x, enemy.sprite.y);
         }
         laser.sprite.destroy();
         this.playerLasers.splice(laserIndex, 1);
@@ -1302,7 +1339,7 @@ class GameScene extends Phaser.Scene {
   //  XP & LEVEL-UP SYSTEM
   // ══════════════════════════════════════════════════════
 
-  _addXP(amount) {
+  _addXP(amount, srcX, srcY) {
     const gs = window.GameState;
     gs.xp += amount;
     const needed = xpForLevel(gs.xpLevel);
@@ -1311,10 +1348,73 @@ class GameScene extends Phaser.Scene {
       gs.xpLevel++;
       this._triggerLevelUp();
     }
+    if (srcX !== undefined && srcY !== undefined) {
+      this._spawnXPOrbs(srcX, srcY, amount);
+    }
+  }
+
+  _spawnXPOrbs(x, y, amount) {
+    if (!this.paddle) return;
+    const count = Phaser.Math.Clamp(2 + Math.floor(amount / 8), 2, 8);
+    for (let i = 0; i < count; i++) {
+      const orb = this.add.circle(
+        x + Phaser.Math.Between(-8, 8),
+        y + Phaser.Math.Between(-8, 8),
+        2.5, 0x00e5ff, 1
+      ).setDepth(50);
+      orb.setStrokeStyle(1, 0xffffff, 0.8);
+
+      // Intermediate control point for curved arc
+      const midX = Phaser.Math.Between(x - 40, x + 40);
+      const midY = y + Phaser.Math.Between(20, 80);
+
+      const delay = i * 40 + Phaser.Math.Between(0, 60);
+      const dur = 480 + Phaser.Math.Between(0, 140);
+
+      this.tweens.addCounter({
+        from: 0, to: 1,
+        duration: dur,
+        delay,
+        ease: 'Cubic.easeIn',
+        onUpdate: (tw) => {
+          const t = tw.getValue();
+          // Always target the paddle's *current* position so orbs track it
+          const px = this.paddle.x;
+          const py = this.paddle.y;
+          const u = 1 - t;
+          orb.x = u * u * x + 2 * u * t * midX + t * t * px;
+          orb.y = u * u * y + 2 * u * t * midY + t * t * py;
+          orb.setScale(1 + t * 0.8);
+          orb.setAlpha(1 - t * 0.3);
+        },
+        onComplete: () => {
+          if (window.SFX) window.SFX.play('xpCollect', { minGap: 0.04 });
+          // Tiny flash on paddle when orb arrives
+          const flash = this.add.circle(this.paddle.x, this.paddle.y, 6, 0x00e5ff, 0.9).setDepth(51);
+          this.tweens.add({
+            targets: flash,
+            scale: { from: 0.5, to: 2 },
+            alpha: { from: 0.9, to: 0 },
+            duration: 220,
+            onComplete: () => flash.destroy(),
+          });
+          // Pulse the XP bar
+          if (this.xpBarFill) {
+            this.tweens.add({
+              targets: this.xpBarFill,
+              alpha: { from: 1, to: 0.5 },
+              duration: 80, yoyo: true,
+            });
+          }
+          orb.destroy();
+        },
+      });
+    }
   }
 
   _triggerLevelUp() {
     this.levelingUp = true;
+    if (window.SFX) window.SFX.play('levelUp');
 
     // Flash and shake
     this.cameras.main.flash(300, 0, 200, 255, false);
@@ -1345,7 +1445,7 @@ class GameScene extends Phaser.Scene {
 
     const subtitle = this.add.text(GW / 2, GH * 0.22, 'Choisis une amélioration', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px', color: '#8899aa', letterSpacing: 2,
+      fontSize: '12px', color: '#cce0ff', letterSpacing: 2,
     }).setOrigin(0.5).setDepth(301);
     this.levelUpElements.push(subtitle);
 
@@ -1367,7 +1467,7 @@ class GameScene extends Phaser.Scene {
     // Skip button
     const skipBtn = this.add.text(GW / 2, GH * 0.82, '[ PASSER ]', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '11px', color: '#334455', letterSpacing: 2,
+      fontSize: '12px', color: '#aabbcc', letterSpacing: 2,
     }).setOrigin(0.5).setDepth(301).setInteractive({ cursor: 'pointer' });
     skipBtn.on('pointerdown', () => this._closeLevelUpOverlay());
     this.levelUpElements.push(skipBtn);
@@ -1385,20 +1485,20 @@ class GameScene extends Phaser.Scene {
 
     const icon = this.add.image(x - w / 2 + 30, y, upg.icon || 'upgrade_wide').setScale(0.8).setDepth(302);
 
-    const nameText = this.add.text(x - w / 2 + 58, y - 12, upg.name, {
+    const nameText = this.add.text(x - w / 2 + 58, y - 16, upg.name, {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '11px', fontStyle: 'bold', color: colorStr,
+      fontSize: '15px', fontStyle: 'bold', color: colorStr,
     }).setDepth(302);
 
-    const descText = this.add.text(x - w / 2 + 58, y + 6, upg.desc, {
+    const descText = this.add.text(x - w / 2 + 58, y + 4, upg.desc, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '9px', color: '#8899aa',
+      fontSize: '12px', color: '#dde8f5', stroke: '#000000', strokeThickness: 2,
       wordWrap: { width: w - 90 },
     }).setDepth(302);
 
-    const rarityLabel = this.add.text(x + w / 2 - 8, y - 12, upg.rarity.toUpperCase(), {
+    const rarityLabel = this.add.text(x + w / 2 - 8, y - 16, upg.rarity.toUpperCase(), {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '7px', color: rarityColor, letterSpacing: 1,
+      fontSize: '10px', color: rarityColor, letterSpacing: 1,
     }).setOrigin(1, 0).setDepth(302);
 
     const elements = [bg, border, topBar, icon, nameText, descText, rarityLabel];
@@ -1524,12 +1624,13 @@ class GameScene extends Phaser.Scene {
   }
 
   _fireLaser() {
-    if (!window.GameState.hasLaser && this.puLaserTimer <= 0 && this.puMinigunTimer <= 0) return;
+    if (!window.GameState.hasLaser && this.puMinigunTimer <= 0) return;
     if (this.laserCooldown > 0) return;
-    this.laserCooldown = this.puMinigunTimer > 0 ? 80 : 160;
+    this.laserCooldown = 160;
 
     this.playerLasers.push({ sprite: this.add.image(this.paddle.x - 20, PADDLE_Y - 16, 'laser_beam') });
     this.playerLasers.push({ sprite: this.add.image(this.paddle.x + 20, PADDLE_Y - 16, 'laser_beam') });
+    if (window.SFX) window.SFX.play('laser');
   }
 
   _hitPaddleByBullet(bullet) {
@@ -1548,6 +1649,7 @@ class GameScene extends Phaser.Scene {
   _loseHP() {
     const gs = window.GameState;
     gs.hp--;
+    if (window.SFX) window.SFX.play('loseLife');
     this._buildHPDisplay();
     this.cameras.main.shake(180, 0.02);
     this.cameras.main.flash(250, 255, 0, 0, false);
@@ -1628,7 +1730,7 @@ class GameScene extends Phaser.Scene {
     gs.bossesDefeated = (gs.bossesDefeated || 0) + 1;
     gs.score += 500 * gs.world;
     gs.voidShards = (gs.voidShards || 0) + gs.world * 5;
-    this._addXP(100 * gs.world);
+    this._addXP(50 * gs.world);
 
     if (gs.upgrades.find(u => u.id === 'healing_light') && gs.hp < gs.maxHp) {
       gs.hp++;
@@ -1662,6 +1764,7 @@ class GameScene extends Phaser.Scene {
   _collectPowerUp(pu) {
     const gs = window.GameState;
     const durMult = gs.puDurationMult || 1;
+    if (window.SFX) window.SFX.play('powerup');
     this._emitParticles(pu.sprite.x, pu.sprite.y, pu.color || 0xffffff, 14);
     pu.sprite.destroy();
     pu.label.destroy();
@@ -1688,10 +1791,6 @@ class GameScene extends Phaser.Scene {
         this.puSlow = true;
         this.balls.forEach(b => { b.vx *= 0.55; b.vy *= 0.55; });
         this._showFloatingText(pu.sprite.x, pu.sprite.y, 'RALENTI!', '#8888ff');
-        break;
-      case 'pu_laser':
-        this.puLaserTimer = 12000 * durMult;
-        this._showFloatingText(pu.sprite.x, pu.sprite.y, 'LASER!', '#ff4400');
         break;
       case 'pu_shield':
         this.puShieldTimer = 20000 * durMult;
@@ -1742,10 +1841,11 @@ class GameScene extends Phaser.Scene {
 
   _dropPowerUp(x, y) {
     const puDef = Phaser.Utils.Array.GetRandom(POWERUPS);
-    const sprite = this.add.image(x, y, puDef.id).setScale(0.8);
-    const label = this.add.text(x, y + 16, puDef.label, {
-      fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '7px', color: puDef.textColor,
+    const sprite = this.add.image(x, y, puDef.id).setScale(1.1);
+    const label = this.add.text(x, y + 22, puDef.label, {
+      fontFamily: 'Orbitron, Courier New',
+      fontSize: '13px', fontStyle: 'bold', color: puDef.textColor,
+      stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5);
     this.powerUps.push({ sprite, label, id: puDef.id, color: parseInt(puDef.textColor.replace('#', '0x')) });
   }
@@ -1784,7 +1884,7 @@ class GameScene extends Phaser.Scene {
     this._showFloatingText(GW / 2, GH / 2, 'NIVEAU COMPLÉTÉ!', '#00ff88', 30);
 
     // Bonus XP for completion
-    this._addXP(50 * window.GameState.world);
+    this._addXP(25 * window.GameState.world);
 
     this.time.delayedCall(1200, () => {
       this.cameras.main.fadeOut(400, 0, 0, 0);
@@ -1842,14 +1942,19 @@ class GameScene extends Phaser.Scene {
   }
 
   _updateBallTrail(ball) {
-    const trail = this.add.circle(ball.sprite.x, ball.sprite.y, 3,
-      this.puFire ? 0xff6600 : this.puGhost ? 0x8888ff : this.puPierceTimer > 0 ? 0x00ffcc : 0x00aaff, 0.3);
+    const color = this.puFire ? 0xff6600
+      : this.puGhost ? 0x8888ff
+      : this.puPierceTimer > 0 ? 0x00ffcc
+      : 0x00e5ff;
+    const trail = this.add.circle(ball.sprite.x, ball.sprite.y, 4, color, 0.6).setDepth(-1);
     ball.trail.push(trail);
     if (ball.trail.length > ball.trailMax) {
       ball.trail.shift().destroy();
     }
     ball.trail.forEach((t, i) => {
-      t.setAlpha((i / ball.trail.length) * 0.25);
+      const k = i / ball.trail.length;
+      t.setAlpha(k * 0.55);
+      t.setScale(0.4 + k * 0.9);
     });
   }
 
@@ -1913,7 +2018,8 @@ class GameScene extends Phaser.Scene {
 
     const introText = this.add.text(GW / 2, GH - 100, levelNarr.intro, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px', color: '#8899aa', align: 'center',
+      fontSize: '12px', color: '#dde8f5', align: 'center',
+      stroke: '#000000', strokeThickness: 3,
       wordWrap: { width: GW - 40 },
     }).setOrigin(0.5).setAlpha(0);
 

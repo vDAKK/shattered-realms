@@ -4,6 +4,10 @@ class MenuScene extends Phaser.Scene {
   create() {
     const W = this.scale.width, H = this.scale.height;
 
+    // ── FX + Music ────────────────────────────────────────
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.5, vignetteStrength: 0.1 });
+    if (window.GameMusic) window.GameMusic.play('menu');
+
     // ── Background ────────────────────────────────────────
     this.add.rectangle(W / 2, H / 2, W, H, 0x020810);
     this._createStarField(W, H);
@@ -33,7 +37,7 @@ class MenuScene extends Phaser.Scene {
 
     this.add.text(W / 2, titleY + 82, '— Un roguelite brick-breaker —', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px', color: '#335566', letterSpacing: 1,
+      fontSize: '11px', color: '#88bbcc', letterSpacing: 1,
     }).setOrigin(0.5);
 
     // ── World label strip ─────────────────────────────────
@@ -68,22 +72,22 @@ class MenuScene extends Phaser.Scene {
     const statsY = H * 0.76;
     this.add.text(W / 2, statsY, `MEILLEUR SCORE: ${(meta.bestScore || 0).toString().padStart(6, '0')}`, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px', color: '#334455',
+      fontSize: '12px', color: '#aaccdd',
     }).setOrigin(0.5);
     this.add.text(W / 2, statsY + 18, `ÉCLATS: ${meta.totalShards || 0} ◆  |  PARTIES: ${meta.totalRuns || 0}  |  VICTOIRES: ${meta.wins || 0}`, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '9px', color: '#223344',
+      fontSize: '10px', color: '#8899bb',
     }).setOrigin(0.5);
 
     // ── Controls hint ─────────────────────────────────────
     this.add.text(W / 2, H - 40, 'TOUCHER → déplacer  |  TAP → lancer', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '9px', color: '#2a4455',
+      fontSize: '10px', color: '#88aabb',
     }).setOrigin(0.5);
 
     this.add.text(W / 2, H - 24, 'XP → upgrades en jeu  |  Éclats → upgrades permanents', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '9px', color: '#2a4455',
+      fontSize: '10px', color: '#88aabb',
     }).setOrigin(0.5);
 
     // ── Pulsing glow ──────────────────────────────────────
@@ -94,7 +98,7 @@ class MenuScene extends Phaser.Scene {
 
     this.add.text(W - 8, H - 8, 'v2.0', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '9px', color: '#223333',
+      fontSize: '10px', color: '#667788',
     }).setOrigin(1, 1);
 
     this._scanlineEffect(W, H);
@@ -305,7 +309,7 @@ class MenuScene extends Phaser.Scene {
     // Close button
     const closeBtn = this.add.text(W / 2, H * 0.92, '[ FERMER ]', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '12px', color: '#446677', letterSpacing: 3,
+      fontSize: '12px', color: '#99bbcc', letterSpacing: 3,
     }).setOrigin(0.5).setDepth(202).setInteractive({ cursor: 'pointer' });
     elements.push(closeBtn);
 

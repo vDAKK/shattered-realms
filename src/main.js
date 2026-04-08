@@ -6,7 +6,7 @@ window.GameState = {
   world: 1, level: 1,
   score: 0, hp: 3, maxHp: 3,
   voidShards: 0, upgrades: [],
-  ballSpeed: 500, paddleWidth: 120, startBalls: 1,
+  ballSpeed: 640, paddleWidth: 90, startBalls: 1,
   hasLaser: false, netBounces: 0,
   voidShieldCharges: 0, timeDilationCharges: 0,
   fireCoreDuration: 0, ghostDuration: 0,
@@ -21,7 +21,7 @@ const config = {
   type: Phaser.AUTO,
   width: 480,
   height: 854,
-  backgroundColor: '#000005',
+  backgroundColor: '#0a1020',
   parent: 'game-container',
 
   scale: {

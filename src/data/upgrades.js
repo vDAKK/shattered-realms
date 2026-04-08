@@ -178,7 +178,6 @@ const POWERUPS = [
   { id: 'pu_multi',   label: 'MULTI',   color: 0xff88ff, textColor: '#ff88ff', desc: '+1 balle' },
   { id: 'pu_expand',  label: 'EXPAND',  color: 0x00e5ff, textColor: '#00e5ff', desc: 'Palette +30px (15s)' },
   { id: 'pu_slow',    label: 'SLOW',    color: 0x8888ff, textColor: '#8888ff', desc: 'Balle ralentie (10s)' },
-  { id: 'pu_laser',   label: 'LASER',   color: 0xff4400, textColor: '#ff4400', desc: 'Laser actif (12s)' },
   { id: 'pu_shield',  label: 'SHIELD',  color: 0x44ff88, textColor: '#44ff88', desc: 'Filet (20s)' },
   { id: 'pu_fire',    label: 'FIRE',    color: 0xff8800, textColor: '#ff8800', desc: '1-shot briques (8s)' },
   { id: 'pu_hp',      label: '+HP',     color: 0xff3388, textColor: '#ff3388', desc: '+1 vie' },

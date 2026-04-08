@@ -5,6 +5,9 @@ class UpgradeScene extends Phaser.Scene {
     const W = this.scale.width, H = this.scale.height;
     const gs = window.GameState;
 
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.5, vignetteStrength: 0.1 });
+    if (window.GameMusic) window.GameMusic.play('menu');
+
     // ── Background ──────────────────────────────────────
     this.add.rectangle(W / 2, H / 2, W, H, 0x020810);
     this._createStarField(W, H);
@@ -37,7 +40,7 @@ class UpgradeScene extends Phaser.Scene {
 
     this.add.text(W / 2, H * 0.15, nextLevelLabel, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '12px', color: '#446677',
+      fontSize: '13px', color: '#aaccdd',
     }).setOrigin(0.5);
 
     // ── Score / Shards ───────────────────────────────────
@@ -78,17 +81,17 @@ class UpgradeScene extends Phaser.Scene {
     // ── Skip button ──────────────────────────────────────
     const skipBtn = this.add.text(W / 2, H * 0.92, '[ PASSER ]', {
       fontFamily: 'Orbitron, Courier New',
-      fontSize: '13px', color: '#334455', letterSpacing: 3,
+      fontSize: '14px', color: '#99aabb', letterSpacing: 3,
     }).setOrigin(0.5).setInteractive({ cursor: 'pointer' });
-    skipBtn.on('pointerover', () => skipBtn.setColor('#667788'));
-    skipBtn.on('pointerout',  () => skipBtn.setColor('#334455'));
+    skipBtn.on('pointerover', () => skipBtn.setColor('#ffffff'));
+    skipBtn.on('pointerout',  () => skipBtn.setColor('#99aabb'));
     skipBtn.on('pointerdown', () => this._proceed());
 
     // ── Current upgrades strip ───────────────────────────
     if (gs.upgrades.length > 0) {
       this.add.text(20, H * 0.85, 'ACTIFS:', {
         fontFamily: 'Share Tech Mono, Courier New',
-        fontSize: '10px', color: '#334455',
+        fontSize: '11px', color: '#99aabb',
       });
       gs.upgrades.slice(0, 6).forEach((u, i) => {
         this.add.text(70 + i * 90, H * 0.85, u.name.slice(0, 12), {
@@ -138,8 +141,9 @@ class UpgradeScene extends Phaser.Scene {
     // Description
     const descText = this.add.text(x, startY + 55, upg.desc, {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '12px', color: '#8899aa', align: 'center',
+      fontSize: '12px', color: '#ccddee', align: 'center',
       wordWrap: { width: w - 32 }, lineSpacing: 4,
+      stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5);
 
     // Select button

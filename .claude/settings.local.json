@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(find /c/Users/dgh/Downloads/shattered-realms-1 -name \"*.js\" -type f -exec wc -l {})",
-      "Bash(find /c/Users/dgh/Downloads/shattered-realms-1 -type d ! -path ./.git/*)"
+      "Bash(find /c/Users/dgh/Downloads/shattered-realms-1 -type d ! -path ./.git/*)",
+      "Bash(wc -l src/scenes/*.js src/main.js)"
     ]
   }
 }

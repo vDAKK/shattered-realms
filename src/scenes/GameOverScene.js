@@ -5,6 +5,10 @@ class GameOverScene extends Phaser.Scene {
     const W = this.scale.width, H = this.scale.height;
     const gs = window.GameState;
 
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.45, vignetteStrength: 0.15 });
+    if (window.GameMusic) window.GameMusic.play('gameover');
+    if (window.SFX) window.SFX.play('gameOver');
+
     this._saveMeta(gs);
 
     // ── Background ──────────────────────────────────────
@@ -33,7 +37,7 @@ class GameOverScene extends Phaser.Scene {
 
     const msgText = this.add.text(W / 2, H * 0.22, NARRATIVE.gameOver.messages[msgIdx], {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '13px', color: '#884455', align: 'center',
+      fontSize: '14px', color: '#ff99aa', align: 'center', stroke: '#000000', strokeThickness: 3,
       wordWrap: { width: W - 40 },
     }).setOrigin(0.5).setAlpha(0);
     this.tweens.add({ targets: msgText, alpha: 1, duration: 500, delay: 800 });
@@ -54,10 +58,10 @@ class GameOverScene extends Phaser.Scene {
     stats.forEach((s, i) => {
       const y = statsY + i * 30;
       const lbl = this.add.text(16, y, s.label, {
-        fontFamily: 'Share Tech Mono, Courier New', fontSize: '11px', color: '#667788',
+        fontFamily: 'Share Tech Mono, Courier New', fontSize: '12px', color: '#aabbcc',
       }).setAlpha(0);
       const val = this.add.text(W - 16, y, s.value, {
-        fontFamily: 'Orbitron, Courier New', fontSize: '12px', color: s.color,
+        fontFamily: 'Orbitron, Courier New', fontSize: '13px', fontStyle: 'bold', color: s.color,
       }).setOrigin(1, 0).setAlpha(0);
 
       const line = this.add.rectangle(W / 2, y + 14, 0, 1, 0x223344, 0.4);
@@ -74,7 +78,7 @@ class GameOverScene extends Phaser.Scene {
     if (gs.voidShards > 0) {
       const notice = this.add.text(W / 2, H * 0.95, `+${gs.voidShards} éclats sauvegardés`, {
         fontFamily: 'Share Tech Mono, Courier New',
-        fontSize: '10px', color: '#443355',
+        fontSize: '11px', color: '#bb99cc',
       }).setOrigin(0.5).setAlpha(0);
       this.tweens.add({ targets: notice, alpha: 0.8, duration: 500, delay: 1500 });
     }

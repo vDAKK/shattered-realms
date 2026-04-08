@@ -36,8 +36,9 @@ class NarrativeScene extends Phaser.Scene {
     this.lineText = this.add.text(W / 2, H / 2, '', {
       fontFamily: 'Share Tech Mono, Courier New',
       fontSize: '17px',
-      color: '#ccddee',
+      color: '#ffffff',
       align: 'center',
+      stroke: '#000000', strokeThickness: 3,
       wordWrap: { width: W * 0.7 },
       lineSpacing: 8,
     }).setOrigin(0.5).setAlpha(0);
@@ -58,7 +59,7 @@ class NarrativeScene extends Phaser.Scene {
     // Line counter
     this.counterText = this.add.text(W / 2, H * 0.87, '', {
       fontFamily: 'Share Tech Mono, Courier New',
-      fontSize: '11px', color: '#334455',
+      fontSize: '11px', color: '#aabbcc',
     }).setOrigin(0.5);
 
     // Bottom decorative line

@@ -5,6 +5,10 @@ class VictoryScene extends Phaser.Scene {
     const W = this.scale.width, H = this.scale.height;
     const gs = window.GameState;
 
+    if (window.Juice) window.Juice.applyScenePostFX(this, { bloomStrength: 0.55, vignetteStrength: 0.1 });
+    if (window.GameMusic) window.GameMusic.play('victory');
+    if (window.SFX) window.SFX.play('victory');
+
     gs.voidShards = (gs.voidShards || 0) + 50;
     gs.score += 9999;
     this._saveMeta(gs);
@@ -72,10 +76,10 @@ class VictoryScene extends Phaser.Scene {
       stats.forEach((s, i) => {
         const y = statsY + i * 28;
         this.add.text(16, y, s.label, {
-          fontFamily: 'Share Tech Mono, Courier New', fontSize: '11px', color: '#667788',
+          fontFamily: 'Share Tech Mono, Courier New', fontSize: '12px', color: '#aabbcc',
         }).setOrigin(0, 0.5);
         this.add.text(W - 16, y, s.value, {
-          fontFamily: 'Orbitron, Courier New', fontSize: '12px', color: s.color,
+          fontFamily: 'Orbitron, Courier New', fontSize: '13px', fontStyle: 'bold', color: s.color,
         }).setOrigin(1, 0.5);
         const line = this.add.rectangle(W / 2, y + 12, 0, 1, 0x334433, 0.4);
         this.tweens.add({ targets: line, width: W - 32, duration: 250, delay: i * 60 });
@@ -85,7 +89,7 @@ class VictoryScene extends Phaser.Scene {
       if (gs.upgrades.length > 0) {
         this.add.text(W / 2, H * 0.68, 'Augments acquis:', {
           fontFamily: 'Share Tech Mono, Courier New',
-          fontSize: '10px', color: '#334455',
+          fontSize: '11px', color: '#aabbcc',
         }).setOrigin(0.5);
 
         const perRow = 4;
