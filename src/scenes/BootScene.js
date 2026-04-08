@@ -187,7 +187,7 @@ class BootScene extends Phaser.Scene {
       pu_multi:  0xff88ff, pu_expand: 0x00e5ff, pu_slow:   0x8888ff,
       pu_laser:  0xff4400, pu_shield: 0x44ff88, pu_fire:   0xff8800,
       pu_hp:     0xff3388, pu_bomb:   0xffcc00,
-      pu_pierce: 0x00ffcc, pu_minigun: 0xff2200, pu_freeze: 0x44aaff, pu_double: 0xffff00,
+      pu_pierce: 0x00ffcc, pu_freeze: 0x44aaff, pu_double: 0xffff00,
     };
     for (const [id, color] of Object.entries(puColors)) {
       g = this.make.graphics({ add: false });

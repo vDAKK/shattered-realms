@@ -183,7 +183,6 @@ const POWERUPS = [
   { id: 'pu_hp',      label: '+HP',     color: 0xff3388, textColor: '#ff3388', desc: '+1 vie' },
   { id: 'pu_bomb',    label: 'BOMB',    color: 0xffcc00, textColor: '#ffcc00', desc: 'Explosion AOE' },
   { id: 'pu_pierce',  label: 'PIERCE',  color: 0x00ffcc, textColor: '#00ffcc', desc: 'Traverse briques (10s)' },
-  { id: 'pu_minigun', label: 'MINIGUN', color: 0xff2200, textColor: '#ff2200', desc: 'Rafale laser (6s)' },
   { id: 'pu_freeze',  label: 'FREEZE',  color: 0x44aaff, textColor: '#44aaff', desc: 'Gèle ennemis (8s)' },
   { id: 'pu_double',  label: 'x2',      color: 0xffff00, textColor: '#ffff00', desc: 'Double score (12s)' },
 ];

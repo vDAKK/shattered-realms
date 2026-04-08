@@ -38,12 +38,18 @@ class GameScene extends Phaser.Scene {
     this.bricksBrokenThisLevel = 0;
     this.explosiveCounter = 0;
     this.hitstopTimer = 0;
+    this.invulnTimer = 0;
     this.levelingUp = false;
 
     // Combo system
     this.combo = 0;
     this.comboTimer = 0;
     this.maxCombo = 0;
+
+    // Surcharge meter (active ability resource)
+    this.surcharge = 0;
+    this.surchargeMax = 100;
+    this.surchargeReady = false;
 
     // Invader wave tracking
     this.invaderWaveCounter = 0;
@@ -59,7 +65,6 @@ class GameScene extends Phaser.Scene {
     this.puGhostTimer = 0;
     this.puBombTimer = 0;
     this.puPierceTimer = 0;
-    this.puMinigunTimer = 0;
     this.puFreezeTimer = 0;
     this.puDoubleTimer = 0;
     this.puSlow = false;
@@ -138,6 +143,8 @@ class GameScene extends Phaser.Scene {
     });
     this.input.keyboard.on('keydown-SPACE', () => this._activateTimeDilation());
     this.input.keyboard.on('keydown-R', () => this._fireLaser());
+    this.input.keyboard.on('keydown-E', () => this._releasePulse());
+    this.input.keyboard.on('keydown-SHIFT', () => this._releasePulse());
 
     // ── Mobile buttons ───────────────────────────────────
     this._buildMobileButtons();
@@ -318,7 +325,7 @@ class GameScene extends Phaser.Scene {
     const isTouch = this.sys.game.device.input.touch;
     if (!isTouch || !this._btnLaser) return;
 
-    const hasLaser = gs.hasLaser || this.puMinigunTimer > 0;
+    const hasLaser = gs.hasLaser;
     this._btnLaser.bg.setAlpha(hasLaser ? 1 : 0.3);
     this._btnLaser.txt.setAlpha(hasLaser ? 1 : 0.3);
 
@@ -465,6 +472,24 @@ class GameScene extends Phaser.Scene {
       fontFamily: 'Orbitron, Courier New',
       fontSize: '10px', color: '#ffffff', fontStyle: 'bold'
     }).setOrigin(0.5).setDepth(11);
+
+    // ── Surcharge meter (active ability) ────────────────
+    const scY = 66;
+    this.surchargeBg = this.add.rectangle(GW / 2, scY, GW - 16, 6, 0x110011, 1).setDepth(10);
+    this.surchargeFill = this.add.rectangle(8, scY, 0, 6, 0xff44aa, 1).setOrigin(0, 0.5).setDepth(10);
+    this.surchargeBorder = this.add.rectangle(GW / 2, scY, GW - 16, 6, 0x000000, 0).setStrokeStyle(1, 0xff44aa, 0.4).setDepth(10);
+    this.surchargeLabel = this.add.text(GW / 2, scY, 'SURCHARGE [E]', {
+      fontFamily: 'Orbitron, Courier New',
+      fontSize: '8px', color: '#ffffff', fontStyle: 'bold', letterSpacing: 2
+    }).setOrigin(0.5).setDepth(11).setAlpha(0.7);
+    // Tap zone over the meter (mobile)
+    const scZone = this.add.zone(GW / 2, scY, GW - 16, 18).setInteractive({ cursor: 'pointer' }).setDepth(12);
+    scZone.on('pointerdown', (ptr) => {
+      if (this.surchargeReady) {
+        this._releasePulse();
+        ptr.event && ptr.event.stopPropagation && ptr.event.stopPropagation();
+      }
+    });
 
     // Active upgrades strip
     this.upgradeIcons = [];
@@ -959,9 +984,16 @@ class GameScene extends Phaser.Scene {
       if (brick.isSecret) {
         this._collectSecret(brick.sprite.x, brick.sprite.y);
       }
+      // Danger zone bonus : top 2 rows give +50% score & XP
+      const inDangerZone = (brick.row !== undefined && brick.row <= 1);
+      const dangerMult = inDangerZone ? 1.5 : 1;
+      // Surcharge gain : more from tough bricks + danger zone
+      this._addSurcharge((brick.maxHp * 3 + 2) * (inDangerZone ? 1.5 : 1));
       // XP gain
-      const xpGain = Math.floor((brick.maxHp * 4 + this.combo) * (this.puDoubleTimer > 0 ? 2 : 1));
+      const xpGain = Math.floor((brick.maxHp * 4 + this.combo) * (this.puDoubleTimer > 0 ? 2 : 1) * dangerMult);
       this._addXP(xpGain, brick.sprite.x, brick.sprite.y);
+      // Stash danger flag for score block below
+      brick._dangerMult = dangerMult;
 
       // Destroyed effects : JUICE
       const color = this._brickColor(brick.cell);
@@ -971,7 +1003,7 @@ class GameScene extends Phaser.Scene {
 
       // Score with combo multiplier
       const comboMult = 1 + Math.min(this.combo * 0.1, 2);
-      const pts = Math.floor(brick.maxHp * 10 * gs.world * comboMult * (gs.scoreMult || 1) * (this.puDoubleTimer > 0 ? 2 : 1));
+      const pts = Math.floor(brick.maxHp * 10 * gs.world * comboMult * (gs.scoreMult || 1) * (this.puDoubleTimer > 0 ? 2 : 1) * (brick._dangerMult || 1));
       gs.score += pts;
       this._showFloatingScore(brick.sprite.x, brick.sprite.y, pts);
 
@@ -1361,14 +1393,10 @@ class GameScene extends Phaser.Scene {
     }
     if (this.puBombTimer > 0) this.puBombTimer -= scaledDelta;
     if (this.puPierceTimer > 0) this.puPierceTimer -= scaledDelta;
-    if (this.puMinigunTimer > 0) {
-      this.puMinigunTimer -= scaledDelta;
-      // Auto-fire lasers rapidly
-      if (this.laserCooldown <= 0) this._fireLaser();
-    }
     if (this.puFreezeTimer > 0) this.puFreezeTimer -= scaledDelta;
     if (this.puDoubleTimer > 0) this.puDoubleTimer -= scaledDelta;
     if (this.laserCooldown > 0) this.laserCooldown -= scaledDelta;
+    if (this.invulnTimer > 0) this.invulnTimer -= scaledDelta;
   }
 
   _updateHUD() {
@@ -1389,6 +1417,16 @@ class GameScene extends Phaser.Scene {
       this.xpBarFill.setFillStyle(0x00e5ff, 1);
     }
 
+    // Surcharge bar
+    if (this.surchargeFill) {
+      const ratio = Math.min(this.surcharge / this.surchargeMax, 1);
+      this.surchargeFill.setDisplaySize(maxBarW * ratio, 6);
+      if (!this.surchargeReady) {
+        this.surchargeFill.setFillStyle(0xff44aa, 1);
+        this.surchargeFill.setAlpha(1);
+      }
+    }
+
     // Combo display
     if (this.combo >= 2) {
       this.comboText.setAlpha(1).setText(`COMBO x${this.combo}`);
@@ -1405,7 +1443,6 @@ class GameScene extends Phaser.Scene {
     if (this.puGhostTimer > 0)   statuses.push(`GHOST ${(this.puGhostTimer/1000).toFixed(0)}s`);
     if (this.puSlowTimer > 0)    statuses.push(`SLOW ${(this.puSlowTimer/1000).toFixed(0)}s`);
     if (this.puPierceTimer > 0)  statuses.push(`PIERCE ${(this.puPierceTimer/1000).toFixed(0)}s`);
-    if (this.puMinigunTimer > 0) statuses.push(`MINIGUN ${(this.puMinigunTimer/1000).toFixed(0)}s`);
     if (this.puFreezeTimer > 0)  statuses.push(`FREEZE ${(this.puFreezeTimer/1000).toFixed(0)}s`);
     if (this.puDoubleTimer > 0)  statuses.push(`x2 ${(this.puDoubleTimer/1000).toFixed(0)}s`);
     this.puStatusText.setText(statuses.join('\n'));
@@ -1779,7 +1816,7 @@ class GameScene extends Phaser.Scene {
   }
 
   _fireLaser() {
-    if (!window.GameState.hasLaser && this.puMinigunTimer <= 0) return;
+    if (!window.GameState.hasLaser) return;
     if (this.laserCooldown > 0) return;
     this.laserCooldown = 160;
 
@@ -1803,6 +1840,7 @@ class GameScene extends Phaser.Scene {
 
   _loseHP() {
     const gs = window.GameState;
+    if (this.invulnTimer > 0) return; // i-frames
     gs.hp--;
     if (window.SFX) window.SFX.play('loseLife');
     this._buildHPDisplay();
@@ -1810,6 +1848,18 @@ class GameScene extends Phaser.Scene {
     this.cameras.main.flash(250, 255, 0, 0, false);
     this._showFloatingText(GW / 2, GH / 2, '-1 VIE', '#ff3388', 30);
     this.hitstopTimer = 80;
+
+    // Invulnerability frames (1.2s)
+    this.invulnTimer = 1200;
+    if (this.paddle) {
+      this.tweens.killTweensOf(this.paddle);
+      this.tweens.add({
+        targets: this.paddle,
+        alpha: { from: 0.3, to: 1 },
+        duration: 120, yoyo: true, repeat: 4,
+        onComplete: () => { if (this.paddle) this.paddle.alpha = 1; }
+      });
+    }
 
     // Reset combo on hit
     this.combo = 0;
@@ -1970,11 +2020,6 @@ class GameScene extends Phaser.Scene {
         this.puPierceTimer = 10000 * durMult;
         this._showFloatingText(pu.sprite.x, pu.sprite.y, 'PERÇANT!', '#00ffcc');
         break;
-      case 'pu_minigun':
-        this.puMinigunTimer = 6000 * durMult;
-        gs.hasLaser = true; // temporarily ensure laser works
-        this._showFloatingText(pu.sprite.x, pu.sprite.y, 'MINIGUN!', '#ff2200');
-        break;
       case 'pu_freeze':
         this.puFreezeTimer = 8000 * durMult;
         this._showFloatingText(pu.sprite.x, pu.sprite.y, 'GELÉ!', '#44aaff');
@@ -2047,6 +2092,78 @@ class GameScene extends Phaser.Scene {
         this._advanceLevel();
       });
     });
+  }
+
+  _addSurcharge(amount) {
+    if (this.surchargeReady) return;
+    this.surcharge = Math.min(this.surcharge + amount, this.surchargeMax);
+    if (this.surcharge >= this.surchargeMax) {
+      this.surchargeReady = true;
+      this._showFloatingText(GW / 2, 90, 'SURCHARGE PRÊTE!', '#ff44aa', 16);
+      if (this.surchargeFill) {
+        this.tweens.add({
+          targets: this.surchargeFill, alpha: { from: 0.5, to: 1 },
+          duration: 300, yoyo: true, repeat: -1
+        });
+      }
+    }
+  }
+
+  _releasePulse() {
+    if (!this.surchargeReady) return;
+    this.surchargeReady = false;
+    this.surcharge = 0;
+    if (this.surchargeFill) {
+      this.tweens.killTweensOf(this.surchargeFill);
+      this.surchargeFill.alpha = 1;
+    }
+
+    // Visual : expanding ring from paddle
+    const ring = this.add.circle(this.paddle.x, this.paddle.y, 10, 0xff44aa, 0).setStrokeStyle(4, 0xff44aa, 1).setDepth(60);
+    this.tweens.add({
+      targets: ring, radius: 600, alpha: { from: 1, to: 0 },
+      duration: 600, ease: 'Cubic.easeOut',
+      onUpdate: () => ring.setRadius(ring.radius),
+      onComplete: () => ring.destroy(),
+    });
+    this.cameras.main.flash(180, 255, 80, 200, false);
+    this.cameras.main.shake(180, 0.012);
+    this.hitstopTimer = 80;
+    if (window.SFX) window.SFX.play('explode');
+
+    // Clear all enemy bullets
+    this.enemyBullets.forEach(b => {
+      this._emitParticles(b.sprite.x, b.sprite.y, 0xff44aa, 4);
+      b.sprite.destroy();
+    });
+    this.enemyBullets.length = 0;
+
+    // Damage all visible bricks (1 dmg each)
+    for (let i = this.bricks.length - 1; i >= 0; i--) {
+      const b = this.bricks[i];
+      if (!b.sprite.visible || b.indestructible) continue;
+      this._damageBrick(b, i);
+    }
+
+    // Damage all enemies
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const e = this.enemies[i];
+      if (!e.alive) continue;
+      e.hp -= 2;
+      if (e.hp <= 0) {
+        this._killEnemy(e, i);
+        window.GameState.score += 50 * window.GameState.world;
+      }
+    }
+
+    // Damage boss
+    if (this.bossActive && !this.bossDefeated && this.boss) {
+      this.boss.hp -= 4;
+      const ratio = Math.max(0, this.boss.hp / this.boss.maxHp);
+      this.bossHpBar.fill.setDisplaySize(300 * ratio, 8);
+      this._emitParticles(this.boss.sprite.x, this.boss.sprite.y, 0xff44aa, 20);
+      if (this.boss.hp <= 0) this._defeatBoss();
+    }
   }
 
   _collectSecret(x, y) {
