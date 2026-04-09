@@ -1376,7 +1376,7 @@ class GameScene extends Phaser.Scene {
     if (this.puExpandTimer > 0) {
       this.puExpandTimer -= scaledDelta;
       if (this.puExpandTimer <= 0) {
-        window.GameState.paddleWidth = Math.max(90, window.GameState.paddleWidth - 25);
+        window.GameState.paddleWidth = Math.max(45, window.GameState.paddleWidth - 25);
         this.paddle.setDisplaySize(window.GameState.paddleWidth, 14);
       }
     }
