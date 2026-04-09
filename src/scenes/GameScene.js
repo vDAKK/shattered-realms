@@ -138,13 +138,11 @@ class GameScene extends Phaser.Scene {
         this._movePaddle(ptr.x);
       }
     });
-    this.input.on('pointerdown', (ptr) => {
+    this.input.on('pointerdown', () => {
       if (this.levelingUp) return;
-      if (ptr.rightButtonDown()) { this._fireLaser(); return; }
       if (!this.ballLaunched) this._launchBall();
     });
     this.input.keyboard.on('keydown-SPACE', () => this._activateTimeDilation());
-    this.input.keyboard.on('keydown-R', () => this._fireLaser());
     this.input.keyboard.on('keydown-E', () => this._releasePulse());
     this.input.keyboard.on('keydown-SHIFT', () => this._releasePulse());
 
@@ -285,8 +283,8 @@ class GameScene extends Phaser.Scene {
   _buildMobileButtons() {
     const isTouch = this.sys.game.device.input.touch;
 
-    this._btnLaser = this._makeTouchBtn(GW - 40, GH - 36, 'LASER', 0xff4400, () => {
-      this._fireLaser();
+    this._btnLaser = this._makeTouchBtn(GW - 40, GH - 36, 'SLOW', 0x8844ff, () => {
+      this._activateTimeDilation();
     });
     this._btnSlow = this._makeTouchBtn(40, GH - 36, 'SLOW', 0x8888ff, () => {
       this._activateTimeDilation();
@@ -1407,7 +1405,11 @@ class GameScene extends Phaser.Scene {
     if (this.puPierceTimer > 0) this.puPierceTimer -= scaledDelta;
     if (this.puFreezeTimer > 0) this.puFreezeTimer -= scaledDelta;
     if (this.puDoubleTimer > 0) this.puDoubleTimer -= scaledDelta;
-    if (this.laserCooldown > 0) this.laserCooldown -= scaledDelta;
+    if (this.laserCooldown > 0) {
+      this.laserCooldown -= scaledDelta;
+    } else if (window.GameState.hasLaser && this.ballLaunched) {
+      this._fireLaser();
+    }
     if (this.invulnTimer > 0) this.invulnTimer -= scaledDelta;
 
     // ── Brick descent ───────────────────────────────────

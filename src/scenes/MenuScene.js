@@ -247,7 +247,7 @@ class MenuScene extends Phaser.Scene {
       hp: 3 + (meta.extraHp || 0),
       maxHp: 3 + (meta.extraHp || 0),
       voidShards: 0, upgrades: [],
-      ballSpeed: 700 + (meta.extraSpeed || 0),
+      ballSpeed: 520 + (meta.extraSpeed || 0),
       paddleWidth: 45 + (meta.extraPaddleW || 0),
       startBalls: 1 + (meta.extraBalls || 0),
       hasLaser: !!(meta.startLaser),
