@@ -1433,9 +1433,7 @@ class GameScene extends Phaser.Scene {
       if (brick.sprite.y + BRICK_H / 2 >= killY) touched = true;
     }
 
-    // Camera shake + red flash warning
     this.cameras.main.shake(120, 0.006);
-    this.cameras.main.flash(80, 255, 40, 40, false);
 
     if (touched) {
       this._showFloatingText(GW / 2, GH / 2 - 40, 'SUBMERGÉ!', '#ff2200', 28);
